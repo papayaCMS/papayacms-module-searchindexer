@@ -40,7 +40,7 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
    * @return boolean Success?
    */
   public function onPublishPage($data) {
-    return $this->_worker->onPublishPage($data);
+    return $this->worker()->onPublishPage($data);
   }
 
   /**

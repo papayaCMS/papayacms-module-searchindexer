@@ -28,6 +28,52 @@
  */
 class PapayaModuleSearchIndexerConnector extends base_connector {
   /**
+   * The module's own GUID
+   */
+  const MODULE_GUID = '1eb06c29ba114ca2804be4bda69375e7';
+
+  /**
+   * Module option definitions
+   * @var array
+   */
+  public $pluginOptionFields = [
+    'ELASTICSEARCH_HOST' => [
+      'ElasticSearch Host',
+      'isSomeText',
+      TRUE,
+      'input',
+      200,
+      '',
+      'localhost'
+    ],
+    'ELASTICSEARCH_PORT' => [
+      'ElasticSearch Port',
+      'isNum',
+      TRUE,
+      'input',
+      5,
+      '',
+      9200
+    ],
+    'ELASTICSEARCH_INDEX' => [
+      'ElasticSearch Index',
+      'isSomeText',
+      TRUE,
+      'input',
+      100
+    ],
+    'OUTPUT_MODE' => [
+      'Output Mode',
+      'isSomeText',
+      TRUE,
+      'input',
+      30,
+      '',
+      'html'
+    ]
+  ];
+
+  /**
    * The worker object
    * @var PapayaModuleSearchIndexerWorker
    */
@@ -54,7 +100,18 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
       $this->_worker = $worker;
     } elseif ($this->_worker === NULL) {
       $this->_worker = new PapayaModuleSearchIndexerWorker();
+      $this->_worker->papaya($this->papaya());
     }
     return $this->_worker;
+  }
+
+  /**
+   * Get a module option
+   *
+   * @param string $option
+   * @return mixed
+   */
+  public function option($option) {
+    return $this->worker()->option($option);
   }
 }

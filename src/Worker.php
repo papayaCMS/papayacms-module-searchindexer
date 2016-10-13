@@ -26,16 +26,22 @@
  */
 class PapayaModuleSearchIndexerWorker extends PapayaObject {
   /**
-   * Pages connector object
+   * Indexer writer object
+   * @var PapayaModuleSearchIndexerWriter
+   */
+  private $_writer = NULL;
+
+  /**
+   * Module option values
+   * @var mixed
+   */
+  private $_moduleOptions = NULL;
+
+  /**
+   * Pages connector
    * @var PagesConnector
    */
   private $_pagesConnector = NULL;
-
-  /**
-   * Page object
-   * @var base_topic
-   */
-  private $_page = NULL;
 
   /**
    * Callback method to be called via action dispatcher whenever a page is published
@@ -59,9 +65,152 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    * @return boolean
    */
   public function indexPage($topicId, $languageId) {
-    $content = $this->pagesConnector()->getParsedContents($this->page(), $topicId, $languageId, TRUE, TRUE);
-    var_dump($content);
-    return TRUE;
+    $result = FALSE;
+    $language = new PapayaContentLanguage();
+    $language->load(['id' => $languageId]);
+    $identifier = $language['identifier'];
+    $reference = $this->papaya()->pageReferences->get($identifier, $topicId);
+    $reference->setPreview(FALSE);
+    $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
+    $url = $reference->get();
+    $options = [
+      'http' => [
+        'method' => 'GET',
+        'header' => 'Connection: close'
+      ]
+    ];
+    $context = stream_context_create($options);
+    $redirectCount = 0;
+    $cookiesSet = FALSE;
+    $content = NULL;
+    do {
+      $stream = @fopen($url, 'r', FALSE, $context);
+      $goOn = FALSE;
+      $finalUrl = $url;
+      if ($url = $this->detectRedirection($http_response_header)) {
+        $redirectCount++;
+        if ($redirectCount < 10) {
+          if (!$cookiesSet && $cookies = $this->searchCookie($http_response_header)) {
+            $cookiesSet = TRUE;
+            foreach ($cookies as $cookie) {
+              $options['http']['header'] .= "\r\nCookie: $cookie";
+            }
+            $context = stream_context_create($options);
+          }
+          $goOn = TRUE;
+        }
+      }
+      if (!$url && is_resource($stream)) {
+        $content = stream_get_contents($stream);
+        fclose($stream);
+        $titles = $this->pagesConnector()->getTitles($topicId, $languageId);
+        $title = '';
+        if (isset($titles[$topicId])) {
+          $title = $titles[$topicId];
+        }
+        $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
+        break;
+      }
+    } while ($goOn);
+    return $result;
+  }
+
+  /**
+   * Add content and its URL to the index
+   *
+   * @param int $topicId Page ID
+   * @param string $identifier Language identifier
+   * @param string $url Public URL of the document
+   * @param string $content Content to index
+   * @param string $title Page title (may be searched with higher priority)
+   * @return bool
+   */
+  public function addToIndex($topicId, $identifier, $url, $content, $title) {
+    return $this->writer()->addToIndex($topicId, $identifier, $url, $content, $title);
+  }
+
+  /**
+   * Detect redirection from response headers
+   *
+   * @param array $headers
+   * @return bool|string Redirection URL or FALSE if there's no redirection
+   */
+  protected function detectRedirection($headers) {
+    $result = FALSE;
+    $status = $this->searchStatus($headers);
+    if ($status >= 300 && $status <= 399) {
+      $result = $this->searchLocation($headers);
+    }
+    return $result;
+  }
+
+  /**
+   * Find HTTP status code in response headers
+   *
+   * @param array $headers
+   * @return int Status code
+   */
+  protected function searchStatus($headers) {
+    $result = 0;
+    foreach ($headers as $header) {
+      if (preg_match('(^HTTP.*(\d{3}))', $header, $matches)) {
+        $result = $matches[1];
+        break;
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Find contents of Location HTTP header
+   *
+   * @param array $headers
+   * @return string location
+   */
+  protected function searchLocation($headers) {
+    $result = '';
+    foreach ($headers as $header) {
+      if (preg_match('(^Location:\s*(.*))', $header, $matches)) {
+        $result = $matches[1];
+        break;
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Find contents of Set-Cookie HTTP headers
+   *
+   * @param array $headers
+   * @return array|bool Array of cookies or FALSE if there aren't any
+   */
+  protected function searchCookie($headers) {
+    $result = FALSE;
+    foreach ($headers as $header) {
+      if (preg_match('(^set\-cookie:\s*(.*))i', $header, $matches)) {
+        if (!is_array($result)) {
+          $result = [];
+        }
+        $result[] = $matches[1];
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Get/set/initialize the writer object
+   *
+   * @param PapayaModuleSearchIndexerWriter $writer optional, default value NULL
+   * @return PapayaModuleSearchIndexerWriter
+   */
+  public function writer($writer = NULL) {
+    if ($writer !== NULL) {
+      $this->_writer = $writer;
+    } elseif ($this->_writer === NULL) {
+      $this->_writer = new PapayaModuleSearchIndexerWriter();
+      $this->_writer->owner($this);
+    }
+    return $this->_writer;
   }
 
   /**
@@ -74,23 +223,22 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
     if ($pagesConnector !== NULL) {
       $this->_pagesConnector = $pagesConnector;
     } elseif ($this->_pagesConnector === NULL) {
-      $this->_pagesConnector = $this->papaya()->plugins->get('69db080d0bb7ce20b52b04e7192a60bf');
+      $this->_pagesConnector = $this->papaya()->plugins->get('69db080d0bb7ce20b52b04e7192a60bf', $this);
     }
     return $this->_pagesConnector;
   }
 
   /**
-   * Get/set/initialize the page object
+   * Get a module option
    *
-   * @param base_topic $page optional, default value NULL
-   * @return base_topic
+   * @param string $option
+   * @param mixed $default optional, default value NULL
+   * @return mixed
    */
-  public function page(base_topic $page = NULL) {
-    if ($page !== NULL) {
-      $this->_page = $page;
-    } elseif ($this->_page === NULL) {
-      $this->_page = new base_topic();
+  public function option($option, $default = NULL) {
+    if ($this->_moduleOptions === NULL) {
+      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleSearchIndexerConnector::MODULE_GUID];
     }
-    return $this->_page;
+    return $this->_moduleOptions->get($option, $default);
   }
 }

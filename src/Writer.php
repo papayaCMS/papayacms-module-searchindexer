@@ -92,6 +92,6 @@ class PapayaModuleSearchIndexerWriter {
     $content = strip_tags($content);
     $content = preg_replace("(([\r ]*\n[\r ]*)+)", "\n", $content);
     $content = preg_replace("( +)", " ", $content);
-    return $content;
+    return trim($content);
   }
 }

@@ -109,9 +109,10 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
    * Get a module option
    *
    * @param string $option
+   * @param mixed $default optional, default value NULL
    * @return mixed
    */
-  public function option($option) {
-    return $this->worker()->option($option);
+  public function option($option, $default) {
+    return $this->worker()->option($option, $default);
   }
 }

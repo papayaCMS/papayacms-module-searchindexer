@@ -26,6 +26,12 @@
  */
 class PapayaModuleSearchIndexerWorker extends PapayaObject {
   /**
+   * Database access object
+   * @var PapayaModuleSearchIndexerDatabaseAccess
+   */
+  private $_databaseAccess = NULL;
+
+  /**
    * Indexer writer object
    * @var PapayaModuleSearchIndexerWriter
    */
@@ -44,6 +50,19 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
   private $_pagesConnector = NULL;
 
   /**
+   * Information on indexing multiple pages
+   * @var array
+   */
+  private $_info = [
+    'total' => 0,
+    'attempted' => 0,
+    'success' => 0,
+    'errors' => 0,
+    'skipped_indexed' => 0,
+    'skipped_errors' => 0
+  ];
+
+  /**
    * Callback method to be called via action dispatcher whenever a page is published
    *
    * @param array $data
@@ -55,6 +74,63 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
       $result = $this->indexPage($data['topic_id'], $languageId) && $result;
     }
     return $result;
+  }
+
+  /**
+   * Index all pages
+   *
+   * @param bool $overrideIndexed optional, default value FALSE
+   * @param int $minTimestamp optional, default value NULL
+   * @param int $errorMinTimestamp optional, default value NULL
+   */
+  public function indexAllPages(
+    $overrideIndexed = FALSE, $minTimestamp = NULL, $errorMinTimestamp = NULL
+  ) {
+    $pages = $this->databaseAccess()->getPublicPages();
+    $total = $this->databaseAccess()->total();
+    $attempted = 0;
+    $success = 0;
+    $errors = 0;
+    $skippedIndexed = 0;
+    $skippedErrors = 0;
+    if (!$overrideIndexed) {
+      $indexedPages = $this->databaseAccess()->getIndexedPages($minTimestamp);
+      foreach ($indexedPages as $topicId => $data) {
+        foreach ($data as $languageId => $timestamp) {
+          if (isset($pages[$topicId]) && in_array($languageId, $pages[$topicId])) {
+            $skippedIndexed++;
+            $index = array_search($languageId, $pages[$topicId]);
+            unset($pages[$topicId][$index]);
+          }
+        }
+      }
+    }
+    $errorPages = $this->databaseAccess()->getErrorPages($errorMinTimestamp);
+    foreach ($pages as $topicId => $languages) {
+      foreach ($languages as $languageId) {
+        if (isset($errorPages[$topicId]) && in_array($languageId, $errorPages[$topicId])) {
+          $skippedErrors++;
+          break;
+        }
+        if ($attempted >= 100) {
+          break 2;
+        }
+        $attempted++;
+        if ($this->indexPage($topicId, $languageId)) {
+          $success++;
+        } else {
+          $errors++;
+        }
+      }
+    }
+    $this->_info = [
+      'total' => $total,
+      'attempted' => $attempted,
+      'success' => $success,
+      'errors' => $errors,
+      'skipped_indexed' => $skippedIndexed,
+      'skipped_errors' => $skippedErrors
+    ];
   }
 
   /**
@@ -98,6 +174,14 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
             $context = stream_context_create($options);
           }
           $goOn = TRUE;
+        } else {
+          $this->databaseAccess()->setIndexed(
+            $topicId,
+            $languageId,
+            'error',
+            'Too many redirects.'
+          );
+          break;
         }
       }
       if (!$url && is_resource($stream)) {
@@ -109,6 +193,16 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
           $title = $titles[$topicId];
         }
         $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
+        $status = $result ? 'success' : 'error';
+        $this->databaseAccess()->setIndexed($topicId, $languageId, $status);
+        break;
+      } elseif (!$goOn) {
+        $this->databaseAccess()->setIndexed(
+          $topicId,
+          $languageId,
+          'error',
+          'Cannot write to index.'
+        );
         break;
       }
     } while ($goOn);
@@ -229,6 +323,21 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
   }
 
   /**
+   * Get/set/initialize the database access object
+   *
+   * @param PapayaModuleSearchIndexerDatabaseAccess optional, default value NULL
+   * @return PapayaModuleSearchIndexerDatabaseAccess
+   */
+  public function databaseAccess($databaseAccess = NULL) {
+    if ($databaseAccess !== NULL) {
+      $this->_databaseAccess = $databaseAccess;
+    } elseif ($this->_databaseAccess === NULL) {
+      $this->_databaseAccess = new PapayaModuleSearchIndexerDatabaseAccess();
+    }
+    return $this->_databaseAccess;
+  }
+
+  /**
    * Get a module option
    *
    * @param string $option
@@ -240,5 +349,14 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
       $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleSearchIndexerConnector::MODULE_GUID];
     }
     return $this->_moduleOptions->get($option, $default);
+  }
+
+  /**
+   * Get information
+   *
+   * @return array
+   */
+  public function info() {
+    return $this->_info;
   }
 }

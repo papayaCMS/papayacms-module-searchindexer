@@ -11,7 +11,15 @@
             file="Connector.php">
       The connector is the public interface to trigger index updates.
     </module>
+    <module type="cronjob"
+            guid="489a82a6ecd2ea67bb90f0775c7e1086"
+            name="Search Indexer Cronjob"
+            class="PapayaModuleSearchIndexerCronjob"
+            file="Cronjob.php">
+      Regularly index all pages of the project.
+    </module>
   </modules>
   <tables>
+    <table name="search_indexer_status" />
   </tables>
 </modulegroup>

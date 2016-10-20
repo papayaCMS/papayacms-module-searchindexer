@@ -69,6 +69,32 @@ class PapayaModuleSearchIndexerWriter {
   }
 
   /**
+   * Remove a node from the index
+   *
+   * @param int $topicId Page ID
+   * @param string $identifier Language identifier
+   * @return bool
+   */
+  public function removeFromIndex($topicId, $identifier) {
+    $result = FALSE;
+    $searchHost = $this->owner()->option('ELASTICSEARCH_HOST');
+    $searchPort = $this->owner()->option('ELASTICSEARCH_PORT');
+    $searchIndex = $this->owner()->option('ELASTICSEARCH_INDEX');
+    $urlPath = 'http://'.$searchHost.':'.$searchPort.'/'.$searchIndex.'/'.$identifier.'/'.$topicId;
+    $options = [
+      'http' => [
+        'method' => 'DELETE'
+      ]
+    ];
+    $context = stream_context_create($options);
+    $connection = @fopen($urlPath, 'r', FALSE, $context);
+    if (is_resource($connection)) {
+      $result = TRUE;
+    }
+    return $result;
+  }
+
+  /**
    * Get/set the owner
    *
    * @param PapayaModuleSearchIndexerWorker $owner optional, default value NULL

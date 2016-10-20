@@ -77,6 +77,18 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
   }
 
   /**
+   * Callback method to be called via action dispatcher whenever a specific page translation is unpublished
+   */
+  public function onUnpublishPage($data) { var_dump('REMOVING', $data);
+    $r = $this->writer()->removeFromIndex(
+      $data['topic_id'],
+      $this->getLanguageById($data['lng_id'])
+    );
+    var_dump($r);
+    return $r;
+  }
+
+  /**
    * Index all pages
    *
    * @param bool $overrideIndexed optional, default value FALSE
@@ -142,9 +154,7 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    */
   public function indexPage($topicId, $languageId) {
     $result = FALSE;
-    $language = new PapayaContentLanguage();
-    $language->load(['id' => $languageId]);
-    $identifier = $language['identifier'];
+    $identifier = $this->getLanguageById($languageId);
     $reference = $this->papaya()->pageReferences->get($identifier, $topicId);
     $reference->setPreview(FALSE);
     $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
@@ -358,5 +368,17 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    */
   public function info() {
     return $this->_info;
+  }
+
+  /**
+   * Get a language identifier by its numeric ID
+   *
+   * @param int $languageId
+   * @return string
+   */
+  protected function getLanguageById($languageId) {
+    $language = new PapayaContentLanguage();
+    $language->load(['id' => $languageId]);
+    return $language['identifier'];
   }
 }

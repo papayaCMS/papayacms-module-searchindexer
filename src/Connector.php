@@ -90,6 +90,16 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
   }
 
   /**
+   * Callback method to be called via action dispatcher whenever a specific page translation is unpublished
+   *
+   * @param array $data
+   * @return boolean Success?
+   */
+  public function onUnpublishPage($data) { var_dump('unpublishing...');
+    return $this->worker()->onUnpublishPage($data);
+  }
+
+  /**
    * Get/set/initialize the worker
    *
    * @param PapayaModuleSearchIndexerWorker optional, default value NULL

@@ -18,6 +18,20 @@
             file="Cronjob.php">
       Regularly index all pages of the project.
     </module>
+    <module type="page"
+            guid="649a79d17080dcc13014c1225adf8d74"
+            name="Search Indexer Result Page"
+            class="PapayaModuleSearchIndexerResultPage"
+            file="Result/Page.php">
+      The result page class displays results of a query to the search engine.
+    </module>
+    <module type="box"
+            guid="bdd5524bc71674d868cde340ec66fdc8"
+            name="Search Indexer Dialog Box"
+            class="PapayaModuleSearchIndexerBox"
+            file="Box.php">
+      The box class displays a simple search form.
+    </module>
   </modules>
   <tables>
     <table name="search_indexer_status" />

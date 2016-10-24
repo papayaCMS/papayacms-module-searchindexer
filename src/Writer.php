@@ -40,7 +40,7 @@ class PapayaModuleSearchIndexerWriter {
    * @param string $content Content to index
    * @param string $title Page title (may be searched with higher priority)
    * @param string $itemId optional, default NULL
-   * @return bool
+   * @return mixed new node ID on success, bool FALSE otherwise
    */
   public function addToIndex($topicId, $identifier, $url, $content, $title, $itemId = NULL) {
     $result = FALSE;
@@ -72,7 +72,9 @@ class PapayaModuleSearchIndexerWriter {
     $context = stream_context_create($options);
     $connection = @fopen($urlPath, 'r', FALSE, $context);
     if (is_resource($connection)) {
-      $result = (FALSE !== fwrite($connection, $data));
+      if (FALSE !== fwrite($connection, $data)) {
+        $result = $searchItemId;
+      }
     }
     return $result;
   }
@@ -80,16 +82,16 @@ class PapayaModuleSearchIndexerWriter {
   /**
    * Remove a node from the index
    *
-   * @param int $topicId Page ID
+   * @param string $nodeId
    * @param string $identifier Language identifier
    * @return bool
    */
-  public function removeFromIndex($topicId, $identifier) {
+  public function removeFromIndex($nodeId, $identifier) {
     $result = FALSE;
     $searchHost = $this->owner()->option('ELASTICSEARCH_HOST');
     $searchPort = $this->owner()->option('ELASTICSEARCH_PORT');
     $searchIndex = $this->owner()->option('ELASTICSEARCH_INDEX');
-    $urlPath = 'http://'.$searchHost.':'.$searchPort.'/'.$searchIndex.'/'.$identifier.'/'.$topicId;
+    $urlPath = 'http://'.$searchHost.':'.$searchPort.'/'.$searchIndex.'/'.$identifier.'/'.$nodeId;
     $options = [
       'http' => [
         'method' => 'DELETE'

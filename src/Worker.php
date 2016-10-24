@@ -202,7 +202,9 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
         if (isset($titles[$topicId])) {
           $title = $titles[$topicId];
         }
-        $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
+        $result = (
+          FALSE !== $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title)
+        );
         $status = $result ? 'success' : 'error';
         $this->databaseAccess()->setIndexed($topicId, $languageId, $status);
         break;
@@ -228,10 +230,21 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    * @param string $content Content to index
    * @param string $title Page title (may be searched with higher priority)
    * @param string $itemId optional, default NULL
-   * @return bool
+   * @return mixed new node ID on success, bool FALSE otherwise
    */
   public function addToIndex($topicId, $identifier, $url, $content, $title, $itemId = NULL) {
     return $this->writer()->addToIndex($topicId, $identifier, $url, $content, $title, $itemId);
+  }
+
+  /**
+   * Remove a node from the index
+   *
+   * @param string $nodeId
+   * @param string $identifier Language identifier
+   * @return bool
+   */
+  public function removeFromIndex($nodeId, $identifier) {
+    return $this->writer()->removeFromIndex($nodeId, $identifier);
   }
 
   /**

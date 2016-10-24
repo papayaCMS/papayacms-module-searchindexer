@@ -108,10 +108,21 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
    * @param string $content Content to index
    * @param string $title Page title (may be searched with higher priority)
    * @param string $itemId optional, default NULL
-   * @return bool
+   * @return mixed new node ID on success, bool FALSE otherwise
    */
   public function addToIndex($topicId, $identifier, $url, $content, $title, $itemId = NULL) {
     return $this->worker()->addToIndex($topicId, $identifier, $url, $content, $title, $itemId);
+  }
+
+  /**
+   * Remove a node from the index
+   *
+   * @param string $nodeId
+   * @param string $identifier Language identifier
+   * @return bool
+   */
+  public function removeFromIndex($nodeId, $identifier) {
+    return $this->worker()->removeFromIndex($nodeId, $identifier);
   }
 
   /**

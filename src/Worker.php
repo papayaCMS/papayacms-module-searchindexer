@@ -227,10 +227,11 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    * @param string $url Public URL of the document
    * @param string $content Content to index
    * @param string $title Page title (may be searched with higher priority)
+   * @param string $itemId optional, default NULL
    * @return bool
    */
-  public function addToIndex($topicId, $identifier, $url, $content, $title) {
-    return $this->writer()->addToIndex($topicId, $identifier, $url, $content, $title);
+  public function addToIndex($topicId, $identifier, $url, $content, $title, $itemId = NULL) {
+    return $this->writer()->addToIndex($topicId, $identifier, $url, $content, $title, $itemId);
   }
 
   /**

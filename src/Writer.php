@@ -39,9 +39,10 @@ class PapayaModuleSearchIndexerWriter {
    * @param string $url Public URL of the document
    * @param string $content Content to index
    * @param string $title Page title (may be searched with higher priority)
+   * @param string $itemId optional, default NULL
    * @return bool
    */
-  public function addToIndex($topicId, $identifier, $url, $content, $title) {
+  public function addToIndex($topicId, $identifier, $url, $content, $title, $itemId = NULL) {
     $result = FALSE;
     $searchHost = $this->owner()->option('ELASTICSEARCH_HOST');
     $searchPort = $this->owner()->option('ELASTICSEARCH_PORT');
@@ -52,7 +53,15 @@ class PapayaModuleSearchIndexerWriter {
       'content' => $this->prepareContent($content)
     ];
     $data = json_encode($rawData);
-    $urlPath = 'http://'.$searchHost.':'.$searchPort.'/'.$searchIndex.'/'.$identifier.'/'.$topicId;
+    $searchItemId = $topicId;
+    if ($itemId !== NULL) {
+      $itemId = preg_replace('(\W)', '', $itemId);
+      if (empty($itemId)) {
+        $itemId = md5(rand());
+      }
+      $searchItemId = sprintf("%s.%d", $itemId, $topicId);
+    }
+    $urlPath = 'http://'.$searchHost.':'.$searchPort.'/'.$searchIndex.'/'.$identifier.'/'.$searchItemId;
     $options = [
       'http' => [
         'method' => 'PUT',

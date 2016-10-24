@@ -95,8 +95,23 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
    * @param array $data
    * @return boolean Success?
    */
-  public function onUnpublishPage($data) { var_dump('unpublishing...');
+  public function onUnpublishPage($data) {
     return $this->worker()->onUnpublishPage($data);
+  }
+
+  /**
+   * Add content and its URL to the index
+   *
+   * @param int $topicId Page ID
+   * @param string $identifier Language identifier
+   * @param string $url Public URL of the document
+   * @param string $content Content to index
+   * @param string $title Page title (may be searched with higher priority)
+   * @param string $itemId optional, default NULL
+   * @return bool
+   */
+  public function addToIndex($topicId, $identifier, $url, $content, $title, $itemId = NULL) {
+    return $this->worker()->addToIndex($topicId, $identifier, $url, $content, $title, $itemId);
   }
 
   /**

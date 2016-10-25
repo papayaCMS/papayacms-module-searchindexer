@@ -111,7 +111,12 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
    * @return mixed new node ID on success, bool FALSE otherwise
    */
   public function addToIndex($topicId, $identifier, $url, $content, $title, $itemId = NULL) {
-    return $this->worker()->addToIndex($topicId, $identifier, $url, $content, $title, $itemId);
+    $result = $this->worker()->addToIndex($topicId, $identifier, $url, $content, $title, $itemId);
+    $searchItemId = $result;
+    if ($searchItemId === FALSE) {
+      $searchItemId = $this->worker()->lastSearchItemId();
+    }
+    
   }
 
   /**

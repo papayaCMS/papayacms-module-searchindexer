@@ -3,6 +3,7 @@
   <fields>
     <field name="topic_id" type="integer" size="4" null="no"/>
     <field name="language_id" type="integer" size="4" null="no"/>
+    <field name="search_item_id" type="string" size="255" null="no"/>
     <field name="indexed" type="integer" size="4" null="no"/>
     <field name="status" type="string" size="10" null="no"/>
     <field name="comment" type="string" size="255" null="no"/>
@@ -11,6 +12,7 @@
     <primary-key>
       <field>topic_id</field>
       <field>language_id</field>
+      <field>search_item_id</field>
     </primary-key>
   </keys>
 </table>

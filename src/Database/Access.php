@@ -130,10 +130,11 @@ class PapayaModuleSearchIndexerDatabaseAccess extends PapayaDatabaseObject {
    *
    * @param int $topicId
    * @param int $languageId
+   * @param string $searchItemId
    * @param string $status
    * @param string $comment optional, default value ''
    */
-  public function setIndexed($topicId, $languageId, $status, $comment = '') {
+  public function setIndexed($topicId, $languageId, $searchItemId, $status, $comment = '') {
     $this->databaseDeleteRecord(
       $this->databaseGetTableName('search_indexer_status'),
       ['topic_id' => $topicId, 'language_id' => $languageId]

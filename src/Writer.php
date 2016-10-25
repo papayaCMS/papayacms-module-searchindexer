@@ -32,6 +32,12 @@ class PapayaModuleSearchIndexerWriter {
   private $_owner = NULL;
 
   /**
+   * Last search item ID created
+   * @var string
+   */
+  private $_lastSearchItemId = '';
+
+  /**
    * Add content and its URL to the index
    *
    * @param int $topicId Page ID
@@ -61,6 +67,7 @@ class PapayaModuleSearchIndexerWriter {
       }
       $searchItemId = sprintf("%s.%d", $itemId, $topicId);
     }
+    $this->_lastSearchItemId = $searchItemId;
     $urlPath = 'http://'.$searchHost.':'.$searchPort.'/'.$searchIndex.'/'.$identifier.'/'.$searchItemId;
     $options = [
       'http' => [
@@ -116,6 +123,15 @@ class PapayaModuleSearchIndexerWriter {
       $this->_owner = $owner;
     }
     return $this->_owner;
+  }
+
+  /**
+   * Get the last search item ID
+   *
+   * @return string
+   */
+  public function lastSearchItemId() {
+    return $this->_lastSearchItemId;
   }
 
   /**

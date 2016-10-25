@@ -185,9 +185,10 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
           }
           $goOn = TRUE;
         } else {
-          $this->databaseAccess()->setIndexed(
+          $this->setIndexed(
             $topicId,
             $languageId,
+            $this->lastSearchItemId(),
             'error',
             'Too many redirects.'
           );
@@ -206,12 +207,14 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
           FALSE !== $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title)
         );
         $status = $result ? 'success' : 'error';
-        $this->databaseAccess()->setIndexed($topicId, $languageId, $status);
+        $searchItemId = $result ? $result : $this->lastSearchItemId();
+        $this->setIndexed($topicId, $languageId, $searchItemId, $status);
         break;
       } elseif (!$goOn) {
-        $this->databaseAccess()->setIndexed(
+        $this->setIndexed(
           $topicId,
           $languageId,
+          $this->lastSearchItemId(),
           'error',
           'Cannot write to index.'
         );
@@ -245,6 +248,19 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    */
   public function removeFromIndex($nodeId, $identifier) {
     return $this->writer()->removeFromIndex($nodeId, $identifier);
+  }
+
+  /**
+   * Set a page with a specific language as indexed
+   *
+   * @param int $topicId
+   * @param int $languageId
+   * @param string $searchItemId
+   * @param string $status
+   * @param string $comment optional, default value ''
+   */
+  public function setIndexed($topicId, $languageId, $searchItemId, $status, $comment = '') {
+    return $this->databaseAccess()->setIndexed($topicId, $languageId, $searchItemId, $status, $comment);
   }
 
   /**
@@ -382,6 +398,15 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    */
   public function info() {
     return $this->_info;
+  }
+
+  /**
+   * Get the last search item ID
+   *
+   * @return string
+   */
+  public function lastSearchItemId() {
+    return $this->writer()->lastSearchItemId();
   }
 
   /**

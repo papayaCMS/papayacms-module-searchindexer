@@ -145,6 +145,7 @@ class PapayaModuleSearchIndexerDatabaseAccess extends PapayaDatabaseObject {
       [
         'topic_id' => $topicId,
         'language_id' => $languageId,
+        'search_item_id' => $searchItemId,
         'indexed' => time(),
         'status' => $status,
         'comment' => $comment

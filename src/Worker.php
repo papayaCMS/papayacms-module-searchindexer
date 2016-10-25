@@ -203,9 +203,7 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
         if (isset($titles[$topicId])) {
           $title = $titles[$topicId];
         }
-        $result = (
-          FALSE !== $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title)
-        );
+        $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
         $status = $result ? 'success' : 'error';
         $searchItemId = $result ? $result : $this->lastSearchItemId();
         $this->setIndexed($topicId, $languageId, $searchItemId, $status);

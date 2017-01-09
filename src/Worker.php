@@ -79,7 +79,7 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
   /**
    * Callback method to be called via action dispatcher whenever a specific page translation is unpublished
    */
-  public function onUnpublishPage($data) { var_dump('REMOVING', $data);
+  public function onUnpublishPage($data) {
     $r = $this->writer()->removeFromIndex(
       $data['topic_id'],
       $this->getLanguageById($data['lng_id'])

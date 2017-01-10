@@ -24,7 +24,7 @@
  * @package Papaya-Modules
  * @subpackage SearchIndexer
  */
-class PapayaModuleSearchIndexerWorker extends PapayaObject {
+class PapayaModuleSearchIndexerConnectorIndexerWorker extends PapayaObject {
   /**
    * Database access object
    * @var PapayaModuleSearchIndexerDatabaseAccess
@@ -84,7 +84,6 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
       $data['topic_id'],
       $this->getLanguageById($data['lng_id'])
     );
-    var_dump($r);
     return $r;
   }
 
@@ -98,6 +97,7 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
   public function indexAllPages(
     $overrideIndexed = FALSE, $minTimestamp = NULL, $errorMinTimestamp = NULL
   ) {
+
     $pages = $this->databaseAccess()->getPublicPages();
     $total = $this->databaseAccess()->total();
     $attempted = 0;
@@ -117,6 +117,7 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
         }
       }
     }
+
     $errorPages = $this->databaseAccess()->getErrorPages($errorMinTimestamp);
     foreach ($pages as $topicId => $languages) {
       foreach ($languages as $languageId) {
@@ -153,12 +154,14 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    * @return boolean
    */
   public function indexPage($topicId, $languageId) {
+
     $result = FALSE;
     $identifier = $this->getLanguageById($languageId);
     $reference = $this->papaya()->pageReferences->get($identifier, $topicId);
     $reference->setPreview(FALSE);
     $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
     $url = $reference->get();
+    //$url = str_replace('1080', '80', $url);
     $options = [
       'http' => [
         'method' => 'GET',
@@ -214,7 +217,7 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
           $languageId,
           $this->lastSearchItemId(),
           'error',
-          'Cannot write to index.'
+          'Cannot write to index.'.$finalUrl
         );
         break;
       }
@@ -332,14 +335,14 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
   /**
    * Get/set/initialize the writer object
    *
-   * @param PapayaModuleSearchIndexerWriter $writer optional, default value NULL
-   * @return PapayaModuleSearchIndexerWriter
+   * @param PapayaModuleSearchIndexerConnectorIndexerWriter $writer optional, default value NULL
+   * @return PapayaModuleSearchIndexerConnectorIndexerWriter
    */
   public function writer($writer = NULL) {
     if ($writer !== NULL) {
       $this->_writer = $writer;
     } elseif ($this->_writer === NULL) {
-      $this->_writer = new PapayaModuleSearchIndexerWriter();
+      $this->_writer = new PapayaModuleSearchIndexerConnectorIndexerWriter();
       $this->_writer->owner($this);
     }
     return $this->_writer;
@@ -384,7 +387,7 @@ class PapayaModuleSearchIndexerWorker extends PapayaObject {
    */
   public function option($option, $default = NULL) {
     if ($this->_moduleOptions === NULL) {
-      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleSearchIndexerConnector::MODULE_GUID];
+      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleSearchIndexerConnectorIndexer::MODULE_GUID];
     }
     return $this->_moduleOptions->get($option, $default);
   }

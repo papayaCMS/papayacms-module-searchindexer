@@ -117,16 +117,10 @@ class PapayaModuleSearchIndexerResultPageEditorController extends PapayaUiContro
     $dialog->hiddenValues->merge($this->_context);
 
     $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-      new PapayaUiStringTranslated('Search host'), 'search_host', 200, 'localhost', new PapayaFilterText()
-    );
-    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-      new PapayaUiStringTranslated('Search port'), 'search_port', 10, '9200', new PapayaFilterInteger()
-    );
-    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-      new PapayaUiStringTranslated('Search index'), 'search_index', 100, 'index', new PapayaFilterText()
-    );
-    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
       new PapayaUiStringTranslated('Results per page'), 'limit', 10, '10', new PapayaFilterInteger()
+    );
+    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
+        new PapayaUiStringTranslated('Paging range'), 'paging_range', 10, '3', new PapayaFilterInteger()
     );
 
     $dialog->buttons[] = new PapayaUiDialogButtonSubmit(

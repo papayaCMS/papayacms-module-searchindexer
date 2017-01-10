@@ -29,6 +29,9 @@ class PapayaModuleSearchIndexerResultPageContent {
    * @var PapayaModuleSearchIndexerResultPage
    */
   private $_owner = NULL;
+  private $searchConnector = NULL;
+  private $paging = NULL;
+  private $results = NULL;
 
   /**
    * @param PapayaModuleSearchIndexerResultPage $owner
@@ -56,103 +59,42 @@ class PapayaModuleSearchIndexerResultPageContent {
    */
   public function appendTo(PapayaXmlElement $parent) {
     $result = $parent->appendElement('search');
-    $host = $this->getOwner()->content()->get('search_host', 'localhost');
-    $port = $this->getOwner()->content()->get('search_port', 9200);
-    $index = $this->getOwner()->content()->get('search_index', 'index');
     $limit = $this->getOwner()->content()->get('limit', 10);
+    $pagingRange = $this->getOwner()->content()->get('paging_range', 5);
     $offset = $this->getOwner()->papaya()->request->getParameter('offset', 0);
     $language = $this->getOwner()->papaya()->request->languageIdentifier;
-    $url = sprintf("http://%s:%d/%s/%s/_search", $host, $port, $index, $language);
     $term = trim($this->getOwner()->papaya()->request->getParameter('q', ''));
+
     if (!empty($term)) {
-      $term = preg_replace('(^\W+)u', '', $term);
-      $term = preg_replace('(\W+$)u', '', $term);
-      $activeTerm = $term;
-      if (!preg_match('(\s)', $activeTerm)) {
-        $activeTerm = sprintf('*%s*', $activeTerm);
-      }
-      $rawQuery = [
-        'from' => $offset,
-        'size' => $limit,
-        'query' => [
-          'query_string' => [
-            'query' => $activeTerm,
-            'fields' => ['title^2', 'content']
-          ]
-        ],
-        'highlight' => [
-          'fields' => [
-            'content' => new stdClass()
-          ]
-        ]
-      ];
-      $query = json_encode($rawQuery);
-      $options = [
-        'http' => [
-          'method' => 'GET',
-          'header' => "Content-type: application/json\r\nContent-length: " . strlen($query),
-          'content' => $query
-        ]
-      ];
-      $context = stream_context_create($options);
-      if ($connection = @fopen($url, 'r', FALSE, $context)) {
-        $return = json_decode(stream_get_contents($connection));
-        if (isset($return->hits) && isset($return->hits->total)) {
-          if ($return->hits->total == 0) {
-            $result->appendElement(
-              'results',
-              ['found' => 'false', 'term' => $term]
-            );
-            $result->appendElement(
-              'error',
-              [],
-              'Nothing found.'
-            );
-          } else {
-            $results = $result->appendElement(
-              'results',
-              [
-                'found' => 'true',
-                'term' => $term,
-                'total' => $return->hits->total,
-                'start' => $offset + 1,
-                'end' => $offset + count($return->hits->hits)
-              ]
-            );
-            foreach ($return->hits->hits as $hit) {
-              if (isset($hit->highlight) &&
-                isset($hit->highlight->content) && count($hit->highlight->content > 0)
-              ) {
-                $content = $hit->highlight->content[0];
-              } elseif (preg_match('(^(.{1,200}\b))', $hit->_source->content, $match)) {
-                $content = $match[1];
-              } else {
-                $content = substr($hit->_source->content, 0, 200);
-              }
-              $results->appendElement(
-                'result',
-                [
-                  'url' => $hit->_source->url,
-                  'title' => $hit->_source->title,
-                  'content' => $content
-                ]
-              );
-            }
-            $this->appendPaging($result, $term, $return->hits->total, $offset, $limit);
-          }
-        } else {
-          $result->appendElement(
+
+      try {
+        $return = $this->searchConnector()->search($term, $language, $limit, $offset);
+      } catch (PapayaModuleSearchIndexerConnectorException $e) {
+        $result->appendElement(
             'results',
             ['found' => 'false', 'term' => $term]
-          );
-          $result->appendElement('error', [], 'Unexpected search result format.');
-        }
+        );
+        $e->appendTo($result->appendElement('error'));
+        return;
+      }
+
+      if (isset($return->hits) && isset($return->hits->total) && $return->hits->total > 0) {
+
+        $this->results()->append($result, $return, $term, $offset);
+
+        $this->paging()->prepare($return->hits->total, $offset, $limit, $term, $pagingRange);
+        $this->paging()->append($result);
+
       } else {
         $result->appendElement(
-          'results',
-          ['found' => 'false', 'term' => $term]
+            'results',
+            ['found' => 'false', 'term' => $term]
         );
-        $result->appendElement('error', [], 'Invalid search server connection.');
+        $result->appendElement(
+            'message',
+            [],
+            'Nothing found.'
+        );
       }
     }
   }
@@ -164,65 +106,44 @@ class PapayaModuleSearchIndexerResultPageContent {
     // Implement!
   }
 
-  protected function appendPaging($node, $term, $total, $offset, $limit) {
-    if ($total > $limit) {
-      $language = $this->getOwner()->papaya()->request->languageIdentifier;
-      $pageId = $this->getOwner()->papaya()->request->pageId;
-      $paging = $node->appendElement('paging');
-      for ($i = 0; $i <= floor($total / $limit) * $limit; $i += $limit) {
-        $reference = $this->getOwner()->papaya()->pageReferences->get(
-          $language,
-          $pageId
-        );
-        $reference->setParameters(
-          [
-            'q' => $term,
-            'offset' => $i
-          ]
-        );
-        $attributes = [
-          'href' => (string)$reference,
-          'type' => 'page'
-        ];
-        if ($i == $offset) {
-          $attributes['current'] = 'true';
-        }
-        $paging->appendElement('page', $attributes);
-      }
-      if ($offset > 0) {
-        $reference = $this->getOwner()->papaya()->pageReferences->get(
-          $language,
-          $pageId
-        );
-        $reference->setParameters(
-          [
-            'q' => $term,
-            'offset' => $offset - $limit
-          ]
-        );
-        $attributes = [
-          'href' => (string)$reference,
-          'type' => 'previous'
-        ];
-        $paging->appendElement('page', $attributes);
-      }
-      if ($offset < floor($total / $limit) * $limit) {
-        $reference = $this->getOwner()->papaya()->pageReferences->get(
-          $language,
-          $pageId
-        );
-        $reference->setParameters(
-          [
-            'q' => $term,
-            'offset' => $offset + $limit
-          ]
-        );
-        $attributes = [
-          'href' => (string)$reference,
-          'type' => 'next'
-        ];
-        $paging->appendElement('page', $attributes);
-      }
+  /**
+   * @param PapayaModuleSearchIndexerConnectorSearch $searchConnector
+   * @return PapayaModuleSearchIndexerConnectorSearch
+   */
+  public function searchConnector(PapayaModuleSearchIndexerConnectorSearch $searchConnector = NULL) {
+    if (isset($searchConnector)) {
+      $this->searchConnector = $searchConnector;
+    } else if (is_null($this->searchConnector)) {
+      $this->searchConnector = new PapayaModuleSearchIndexerConnectorSearch();
+      $this->searchConnector->papaya($this->getOwner()->papaya());
     }
+    return $this->searchConnector;
+  }
+
+  /**
+   * @param PapayaModuleSearchIndexerResultPageContentPaging $paging
+   * @return PapayaModuleSearchIndexerResultPageContentPaging
+   */
+  public function paging(PapayaModuleSearchIndexerResultPageContentPaging $paging = NULL) {
+    if (isset($paging)) {
+      $this->paging = $paging;
+    } else if (is_null($this->paging)) {
+      $this->paging = new PapayaModuleSearchIndexerResultPageContentPaging();
+      $this->paging->papaya($this->getOwner()->papaya());
+    }
+    return $this->paging;
+  }
+
+  /**
+   * @param PapayaModuleSearchIndexerResultPageContentResults $results
+   * @return PapayaModuleSearchIndexerResultPageContentResults
+   */
+  public function results(PapayaModuleSearchIndexerResultPageContentResults $results = NULL) {
+    if (isset($results)) {
+      $this->results = $results;
+    } else if (is_null($this->results)) {
+      $this->results = new PapayaModuleSearchIndexerResultPageContentResults();
+    }
+    return $this->results;
   }
 }

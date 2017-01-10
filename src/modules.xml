@@ -6,10 +6,17 @@
   <modules>
     <module type="connector"
             guid="1eb06c29ba114ca2804be4bda69375e7"
-            name="Search Indexer Connector"
-            class="PapayaModuleSearchIndexerConnector"
-            file="Connector.php">
+            name="Elasticsearch Indexer Connector"
+            class="PapayaModuleSearchIndexerConnectorIndexer"
+            file="Connector/Indexer.php">
       The connector is the public interface to trigger index updates.
+    </module>
+    <module type="connector"
+            guid="0a6800488f9760b93dd9ff17ee03c28a"
+            name="Elasticsearch Search Connector"
+            class="PapayaModuleSearchIndexerConnectorSearch"
+            file="Connector/Search.php">
+      The connector is the public interface to search results.
     </module>
     <module type="cronjob"
             guid="489a82a6ecd2ea67bb90f0775c7e1086"

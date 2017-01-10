@@ -8,7 +8,9 @@
   },
   "require": {
     "papaya/cms-core": "*",
-    "papaya/module-default": "*"
+    "papaya/module-default": "*",
+    "papaya/module-default-cronjobs":"*",
+    "papaya/module-actions":"*"
   },
   "require-dev": {
     "papaya/test-framework": "*",

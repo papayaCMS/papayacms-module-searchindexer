@@ -52,7 +52,7 @@ class PapayaModuleSearchIndexerCronjob extends base_cronjob {
 
   /**
    * Worker object
-   * @var PapayaModuleSearchIndexerWorker
+   * @var PapayaModuleSearchIndexerConnectorIndexerWorker
    */
   private $_worker = NULL;
 
@@ -96,14 +96,14 @@ Skipped (errors): %d\n",
   /**
    * Get/set/initialize the worker object
    *
-   * @param PapayaModuleSearchIndexerWorker $worker optional, default value NULL
-   * @return PapayaModuleSearchIndexerWorker
+   * @param PapayaModuleSearchIndexerConnectorIndexerWorker $worker optional, default value NULL
+   * @return PapayaModuleSearchIndexerConnectorIndexerWorker
    */
   public function worker($worker = NULL) {
     if ($worker !== NULL) {
       $this->_worker = $worker;
     } elseif ($this->_worker === NULL) {
-      $this->_worker = new PapayaModuleSearchIndexerWorker();
+      $this->_worker = new PapayaModuleSearchIndexerConnectorIndexerWorker();
     }
     return $this->_worker;
   }

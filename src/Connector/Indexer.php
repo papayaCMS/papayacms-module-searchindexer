@@ -26,7 +26,7 @@
  * @package Papaya-Modules
  * @subpackage SearchIndexer
  */
-class PapayaModuleSearchIndexerConnector extends base_connector {
+class PapayaModuleSearchIndexerConnectorIndexer extends base_connector {
   /**
    * The module's own GUID
    */
@@ -37,40 +37,40 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
    * @var array
    */
   public $pluginOptionFields = [
-    'ELASTICSEARCH_HOST' => [
-      'ElasticSearch Host',
-      'isSomeText',
-      TRUE,
-      'input',
-      200,
-      '',
-      'localhost'
-    ],
-    'ELASTICSEARCH_PORT' => [
-      'ElasticSearch Port',
-      'isNum',
-      TRUE,
-      'input',
-      5,
-      '',
-      9200
-    ],
-    'ELASTICSEARCH_INDEX' => [
-      'ElasticSearch Index',
-      'isSomeText',
-      TRUE,
-      'input',
-      100
-    ],
-    'OUTPUT_MODE' => [
-      'Output Mode',
-      'isSomeText',
-      TRUE,
-      'input',
-      30,
-      '',
-      'html'
-    ]
+      'ELASTICSEARCH_HOST' => [
+          'ElasticSearch Host',
+          'isSomeText',
+          TRUE,
+          'input',
+          200,
+          '',
+          'localhost'
+      ],
+      'ELASTICSEARCH_PORT' => [
+          'ElasticSearch Port',
+          'isNum',
+          TRUE,
+          'input',
+          5,
+          '',
+          9200
+      ],
+      'ELASTICSEARCH_INDEX' => [
+          'ElasticSearch Index',
+          'isSomeText',
+          TRUE,
+          'input',
+          100
+      ],
+      'OUTPUT_MODE' => [
+          'Output Mode',
+          'isSomeText',
+          TRUE,
+          'input',
+          30,
+          '',
+          'html'
+      ]
   ];
 
   /**
@@ -116,7 +116,7 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
     if ($searchItemId === FALSE) {
       $searchItemId = $this->worker()->lastSearchItemId();
     }
-    
+    return $searchItemId;
   }
 
   /**
@@ -133,14 +133,14 @@ class PapayaModuleSearchIndexerConnector extends base_connector {
   /**
    * Get/set/initialize the worker
    *
-   * @param PapayaModuleSearchIndexerWorker optional, default value NULL
-   * @return PapayaModuleSearchIndexerWorker
+   * @param PapayaModuleSearchIndexerConnectorIndexerWorker optional, default value NULL
+   * @return PapayaModuleSearchIndexerConnectorIndexerWorker
    */
-  public function worker(PapayaModuleSearchIndexerWorker $worker = NULL) {
+  public function worker(PapayaModuleSearchIndexerConnectorIndexerWorker $worker = NULL) {
     if ($worker !== NULL) {
       $this->_worker = $worker;
     } elseif ($this->_worker === NULL) {
-      $this->_worker = new PapayaModuleSearchIndexerWorker();
+      $this->_worker = new PapayaModuleSearchIndexerConnectorIndexerWorker();
       $this->_worker->papaya($this->papaya());
     }
     return $this->_worker;

@@ -24,10 +24,10 @@
  * @package Papaya-Modules
  * @subpackage SearchIndexer
  */
-class PapayaModuleSearchIndexerWriter {
+class PapayaModuleSearchIndexerConnectorIndexerWriter {
   /**
    * Owner object
-   * @var PapayaModuleSearchIndexerWorker
+   * @var PapayaModuleSearchIndexerConnectorIndexerWorker
    */
   private $_owner = NULL;
 
@@ -36,6 +36,8 @@ class PapayaModuleSearchIndexerWriter {
    * @var string
    */
   private $_lastSearchItemId = '';
+
+  private $connection = NULL;
 
   /**
    * Add content and its URL to the index
@@ -76,6 +78,7 @@ class PapayaModuleSearchIndexerWriter {
         'content' => $data
       ]
     ];
+
     $context = stream_context_create($options);
     $connection = @fopen($urlPath, 'r', FALSE, $context);
     if (is_resource($connection)) {
@@ -115,8 +118,8 @@ class PapayaModuleSearchIndexerWriter {
   /**
    * Get/set the owner
    *
-   * @param PapayaModuleSearchIndexerWorker $owner optional, default value NULL
-   * @return PapayaModuleSearchIndexerWorker
+   * @param PapayaModuleSearchIndexerConnectorIndexerWorker $owner optional, default value NULL
+   * @return PapayaModuleSearchIndexerConnectorIndexerWorker
    */
   public function owner($owner = NULL) {
     if ($owner !== NULL) {
@@ -146,5 +149,18 @@ class PapayaModuleSearchIndexerWriter {
     $content = preg_replace("(([\r ]*\n[\r ]*)+)", "\n", $content);
     $content = preg_replace("( +)", " ", $content);
     return trim($content);
+  }
+
+  /**
+   * @param PapayaModuleSearchIndexerConnectorConnection $connection
+   * @return PapayaModuleSearchIndexerConnectorConnection
+   */
+  public function connection(PapayaModuleSearchIndexerConnectorConnection $connection = NULL) {
+    if (isset($connection)) {
+      $this->connection = $connection;
+    } else if (is_null($this->connection)) {
+      $this->connection = new PapayaModuleSearchIndexerConnectorConnection();
+    }
+    return $this->connection;
   }
 }

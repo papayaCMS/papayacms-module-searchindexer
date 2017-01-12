@@ -32,9 +32,18 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
 
       $rawQuery = [
           $suggestion => [
-              'text' => $activeTerm,
-              'term' => [
-                  'field' => 'title'
+              'title_suggest' => [
+                  'text' => $activeTerm,
+                  'completion' => [
+                      'field' => 'title_suggest'
+                  ]
+              ],
+              'content_suggest' => [
+                  'text' => $activeTerm,
+                  'completion' => [
+
+                      'field' => 'content_suggest'
+                  ]
               ]
           ]
       ];

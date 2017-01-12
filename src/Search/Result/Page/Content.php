@@ -58,6 +58,7 @@ class PapayaModuleElasticsearchSearchResultPageContent {
    * @param PapayaXmlElement $parent
    */
   public function appendTo(PapayaXmlElement $parent) {
+    $parent->appendElement('title', array(), $this->content()->get('title', ''));
     $result = $parent->appendElement('search');
     $limit = $this->getOwner()->content()->get('limit', 10);
     $pagingRange = $this->getOwner()->content()->get('paging_range', 5);

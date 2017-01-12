@@ -12,7 +12,7 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
  */
 
@@ -24,9 +24,9 @@
  * To get an instance: $connector = $this->papaya()->plugins->get('1eb06c29ba114ca2804be4bda69375e7');
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  */
-class PapayaModuleSearchIndexerConnectorIndexer extends base_connector {
+class PapayaModuleElasticsearchIndexerConnector extends base_connector {
   /**
    * The module's own GUID
    */
@@ -75,7 +75,7 @@ class PapayaModuleSearchIndexerConnectorIndexer extends base_connector {
 
   /**
    * The worker object
-   * @var PapayaModuleSearchIndexerWorker
+   * @var PapayaModuleElasticsearchIndexerWorker
    */
   private $_worker = NULL;
 
@@ -133,14 +133,14 @@ class PapayaModuleSearchIndexerConnectorIndexer extends base_connector {
   /**
    * Get/set/initialize the worker
    *
-   * @param PapayaModuleSearchIndexerConnectorIndexerWorker optional, default value NULL
-   * @return PapayaModuleSearchIndexerConnectorIndexerWorker
+   * @param PapayaModuleElasticsearchIndexerWorker optional, default value NULL
+   * @return PapayaModuleElasticsearchIndexerWorker
    */
-  public function worker(PapayaModuleSearchIndexerConnectorIndexerWorker $worker = NULL) {
+  public function worker(PapayaModuleElasticsearchIndexerWorker $worker = NULL) {
     if ($worker !== NULL) {
       $this->_worker = $worker;
     } elseif ($this->_worker === NULL) {
-      $this->_worker = new PapayaModuleSearchIndexerConnectorIndexerWorker();
+      $this->_worker = new PapayaModuleElasticsearchIndexerWorker();
       $this->_worker->papaya($this->papaya());
     }
     return $this->_worker;

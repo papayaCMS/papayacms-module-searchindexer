@@ -12,7 +12,7 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
  */
 
@@ -22,9 +22,9 @@
  * Collects all database operations for the search indexer.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  */
-class PapayaModuleSearchIndexerDatabaseAccess extends PapayaDatabaseObject {
+class PapayaModuleElasticsearchDatabaseAccess extends PapayaDatabaseObject {
   /**
    * Languages
    * @var array

@@ -1,6 +1,6 @@
 <?php
 /**
-* Search Indexer Box
+* Elasticsearch Box
 *
 * @copyright by dimensional GmbH, Cologne, Germany - All rights reserved.
 * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License, version 2
@@ -12,7 +12,7 @@
 * FOR A PARTICULAR PURPOSE.
 *
 * @package Papaya-Modules
-* @subpackage SearchIndexer
+* @subpackage Elasticsearch
 * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
 */
 
@@ -22,9 +22,9 @@
 * The box class displays a simple search form.
 *
 * @package Papaya-Modules
-* @subpackage SearchIndexer
+* @subpackage Elasticsearch
 */
-class PapayaModuleSearchIndexerBox
+class PapayaModuleElasticsearchBox
 extends
   PapayaObjectInteractive
 implements
@@ -96,7 +96,7 @@ implements
    * @return PapayaPluginEditor
    */
   public function createEditor($callbackContext, PapayaPluginEditableContent $content) {
-    $editor = new PapayaModuleSearchIndexerBoxEditor($content);
+    $editor = new PapayaModuleElasticsearchBoxEditor($content);
     $editor->papaya($this->papaya());
     return $editor;
   }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Search Indexer Cronjob
+ * Elasticsearch Indexer Cronjob
  *
  * @copyright by dimensional GmbH, Cologne, Germany - All rights reserved.
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License, version 2
@@ -12,7 +12,7 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
  */
 
@@ -22,9 +22,9 @@
  * The cronjob class provides indexing of all pages as a cronjob.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  */
-class PapayaModuleSearchIndexerCronjob extends base_cronjob {
+class PapayaModuleElasticsearchIndexerCronjob extends base_cronjob {
   /**
    * Configuration edit fields
    * @var array
@@ -52,7 +52,7 @@ class PapayaModuleSearchIndexerCronjob extends base_cronjob {
 
   /**
    * Worker object
-   * @var PapayaModuleSearchIndexerConnectorIndexerWorker
+   * @var PapayaModuleElasticsearchIndexerWorker
    */
   private $_worker = NULL;
 
@@ -96,14 +96,14 @@ Skipped (errors): %d\n",
   /**
    * Get/set/initialize the worker object
    *
-   * @param PapayaModuleSearchIndexerConnectorIndexerWorker $worker optional, default value NULL
-   * @return PapayaModuleSearchIndexerConnectorIndexerWorker
+   * @param PapayaModuleElasticsearchIndexerWorker $worker optional, default value NULL
+   * @return PapayaModuleElasticsearchIndexerWorker
    */
   public function worker($worker = NULL) {
     if ($worker !== NULL) {
       $this->_worker = $worker;
     } elseif ($this->_worker === NULL) {
-      $this->_worker = new PapayaModuleSearchIndexerConnectorIndexerWorker();
+      $this->_worker = new PapayaModuleElasticsearchIndexerWorker();
     }
     return $this->_worker;
   }

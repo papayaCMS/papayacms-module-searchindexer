@@ -12,7 +12,7 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
  */
 
@@ -22,18 +22,18 @@
  * The worker class provides the actual functionality.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  */
-class PapayaModuleSearchIndexerConnectorIndexerWorker extends PapayaObject {
+class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
   /**
    * Database access object
-   * @var PapayaModuleSearchIndexerDatabaseAccess
+   * @var PapayaModuleElasticsearchDatabaseAccess
    */
   private $_databaseAccess = NULL;
 
   /**
    * Indexer writer object
-   * @var PapayaModuleSearchIndexerWriter
+   * @var PapayaModuleElasticsearchIndexerWriter
    */
   private $_writer = NULL;
 
@@ -161,7 +161,6 @@ class PapayaModuleSearchIndexerConnectorIndexerWorker extends PapayaObject {
     $reference->setPreview(FALSE);
     $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
     $url = $reference->get();
-    //$url = str_replace('1080', '80', $url);
     $options = [
       'http' => [
         'method' => 'GET',
@@ -335,14 +334,14 @@ class PapayaModuleSearchIndexerConnectorIndexerWorker extends PapayaObject {
   /**
    * Get/set/initialize the writer object
    *
-   * @param PapayaModuleSearchIndexerConnectorIndexerWriter $writer optional, default value NULL
-   * @return PapayaModuleSearchIndexerConnectorIndexerWriter
+   * @param PapayaModuleElasticsearchIndexerWriter $writer optional, default value NULL
+   * @return PapayaModuleElasticsearchIndexerWriter
    */
   public function writer($writer = NULL) {
     if ($writer !== NULL) {
       $this->_writer = $writer;
     } elseif ($this->_writer === NULL) {
-      $this->_writer = new PapayaModuleSearchIndexerConnectorIndexerWriter();
+      $this->_writer = new PapayaModuleElasticsearchIndexerWriter();
       $this->_writer->owner($this);
     }
     return $this->_writer;
@@ -366,14 +365,14 @@ class PapayaModuleSearchIndexerConnectorIndexerWorker extends PapayaObject {
   /**
    * Get/set/initialize the database access object
    *
-   * @param PapayaModuleSearchIndexerDatabaseAccess optional, default value NULL
-   * @return PapayaModuleSearchIndexerDatabaseAccess
+   * @param PapayaModuleElasticsearchDatabaseAccess optional, default value NULL
+   * @return PapayaModuleElasticsearchDatabaseAccess
    */
   public function databaseAccess($databaseAccess = NULL) {
     if ($databaseAccess !== NULL) {
       $this->_databaseAccess = $databaseAccess;
     } elseif ($this->_databaseAccess === NULL) {
-      $this->_databaseAccess = new PapayaModuleSearchIndexerDatabaseAccess();
+      $this->_databaseAccess = new PapayaModuleElasticsearchDatabaseAccess();
     }
     return $this->_databaseAccess;
   }
@@ -387,7 +386,7 @@ class PapayaModuleSearchIndexerConnectorIndexerWorker extends PapayaObject {
    */
   public function option($option, $default = NULL) {
     if ($this->_moduleOptions === NULL) {
-      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleSearchIndexerConnectorIndexer::MODULE_GUID];
+      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleElasticsearchIndexerConnector::MODULE_GUID];
     }
     return $this->_moduleOptions->get($option, $default);
   }

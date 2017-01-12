@@ -1,6 +1,6 @@
 <?php
 
-class PapayaModuleSearchIndexerResultPageContentPaging {
+class PapayaModuleElasticsearchSearchResultPageContentPaging {
 
   /**
    * @var int

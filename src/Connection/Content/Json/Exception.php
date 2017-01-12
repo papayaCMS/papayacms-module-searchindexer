@@ -1,6 +1,7 @@
 <?php
 
-class PapayaModuleSearchIndexerConnectorConnectionContentException extends PapayaModuleSearchIndexerConnectorException {
+class PapayaModuleElasticsearchConnectionContentJsonException extends
+    PapayaModuleElasticsearchException {
 
   /**
    * Severity information
@@ -34,7 +35,7 @@ class PapayaModuleSearchIndexerConnectorConnectionContentException extends Papay
    * Create expeiton an store values
    */
   public function __construct() {
-    parent::__construct('Invalid connection content.', 0);
+    parent::__construct('Unexpected search result format.', 0);
   }
 
   /**

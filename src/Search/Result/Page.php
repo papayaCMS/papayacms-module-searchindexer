@@ -1,6 +1,6 @@
 <?php
 /**
- * Search Indexer Result Page
+ * Elasticsearch Search Result Page
  *
  * @copyright by dimensional GmbH, Cologne, Germany - All rights reserved.
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License, version 2
@@ -12,7 +12,7 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
  */
 
@@ -22,9 +22,9 @@
  * The result page class displays results of a query to the search engine.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  */
-class PapayaModuleSearchIndexerResultPage extends PapayaObjectInteractive
+class PapayaModuleElasticsearchSearchResultPage extends PapayaObjectInteractive
   implements
   PapayaPluginAppendable,
   PapayaPluginQuoteable,
@@ -36,7 +36,7 @@ class PapayaModuleSearchIndexerResultPage extends PapayaObjectInteractive
   private $_content = NULL;
 
   /**
-   * @var PapayaModuleSearchIndexerResultPageContent
+   * @var PapayaModuleElasticsearchSearchResultPageContent
    */
   private $_pageContent = NULL;
 
@@ -102,14 +102,14 @@ class PapayaModuleSearchIndexerResultPage extends PapayaObjectInteractive
 
   /**
    *
-   * @param PapayaModuleSearchIndexerResultPageContent $pageContent
-   * @return PapayaModuleSearchIndexerResultPageContent
+   * @param PapayaModuleElasticsearchSearchResultPageContent $pageContent
+   * @return PapayaModuleElasticsearchSearchResultPageContent
    */
-  public function pageContent(PapayaModuleSearchIndexerResultPageContent $pageContent = NULL) {
+  public function pageContent(PapayaModuleElasticsearchSearchResultPageContent $pageContent = NULL) {
     if (isset($pageContent)) {
       $this->_pageContent = $pageContent;
     } elseif (is_null($this->_pageContent)) {
-      $this->_pageContent = new PapayaModuleSearchIndexerResultPageContent($this);
+      $this->_pageContent = new PapayaModuleElasticsearchSearchResultPageContent($this);
     }
     return $this->_pageContent;
   }
@@ -118,7 +118,7 @@ class PapayaModuleSearchIndexerResultPage extends PapayaObjectInteractive
    * @see PapayaPluginEditable::editor()
    */
   public function createEditor($callbackContext, PapayaPluginEditableContent $content = NULL) {
-    $editor = new PapayaModuleSearchIndexerResultPageEditor($content);
+    $editor = new PapayaModuleElasticsearchSearchResultPageEditor($content);
     $editor->papaya($this->papaya());
     return $editor;
   }

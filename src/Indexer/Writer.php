@@ -12,7 +12,7 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
  */
 
@@ -22,12 +22,12 @@
  * The writer class connects to ElasticSearch and adds a document to the index.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  */
-class PapayaModuleSearchIndexerConnectorIndexerWriter {
+class PapayaModuleElasticsearchIndexerWriter {
   /**
    * Owner object
-   * @var PapayaModuleSearchIndexerConnectorIndexerWorker
+   * @var PapayaModuleElasticsearchIndexerWorker
    */
   private $_owner = NULL;
 
@@ -37,6 +37,9 @@ class PapayaModuleSearchIndexerConnectorIndexerWriter {
    */
   private $_lastSearchItemId = '';
 
+  /**
+   * @var PapayaModuleElasticsearchConnection
+   */
   private $connection = NULL;
 
   /**
@@ -58,7 +61,9 @@ class PapayaModuleSearchIndexerConnectorIndexerWriter {
     $rawData = [
       'url' => $url,
       'title' => $title,
-      'content' => $this->prepareContent($content)
+      'content' => $this->prepareContent($content)//,
+      //'title_suggest' => $title,
+      //'content_suggest' => $this->prepareContent($content)
     ];
     $data = json_encode($rawData);
     $searchItemId = $topicId;
@@ -118,8 +123,8 @@ class PapayaModuleSearchIndexerConnectorIndexerWriter {
   /**
    * Get/set the owner
    *
-   * @param PapayaModuleSearchIndexerConnectorIndexerWorker $owner optional, default value NULL
-   * @return PapayaModuleSearchIndexerConnectorIndexerWorker
+   * @param PapayaModuleElasticsearchIndexerWorker $owner optional, default value NULL
+   * @return PapayaModuleElasticsearchIndexerWorker
    */
   public function owner($owner = NULL) {
     if ($owner !== NULL) {
@@ -152,14 +157,14 @@ class PapayaModuleSearchIndexerConnectorIndexerWriter {
   }
 
   /**
-   * @param PapayaModuleSearchIndexerConnectorConnection $connection
-   * @return PapayaModuleSearchIndexerConnectorConnection
+   * @param PapayaModuleElasticsearchConnection $connection
+   * @return PapayaModuleElasticsearchConnection
    */
-  public function connection(PapayaModuleSearchIndexerConnectorConnection $connection = NULL) {
+  public function connection(PapayaModuleElasticsearchConnection $connection = NULL) {
     if (isset($connection)) {
       $this->connection = $connection;
     } else if (is_null($this->connection)) {
-      $this->connection = new PapayaModuleSearchIndexerConnectorConnection();
+      $this->connection = new PapayaModuleElasticsearchConnection();
     }
     return $this->connection;
   }

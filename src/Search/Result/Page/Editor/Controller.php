@@ -6,7 +6,8 @@
  * Time: 17:47
  */
 
-class PapayaModuleSearchIndexerResultPageEditorController extends PapayaUiControlCommandDialog {
+class PapayaModuleElasticsearchSearchResultPageEditorController
+    extends PapayaUiControlCommandDialog {
   /**
    * @var PapayaPluginEditableContent
    */

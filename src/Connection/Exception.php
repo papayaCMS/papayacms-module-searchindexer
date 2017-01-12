@@ -1,7 +1,7 @@
 <?php
 
-class PapayaModuleSearchIndexerConnectorConnectionException
-    extends PapayaModuleSearchIndexerConnectorException {
+class PapayaModuleElasticsearchConnectionException
+    extends PapayaModuleElasticsearchException {
 
   /**
    * Severity information

@@ -1,6 +1,6 @@
 <?php
 
-class PapayaModuleSearchIndexerResultPageContentResults {
+class PapayaModuleElasticsearchSearchResultPageContentResults {
 
   public function append(PapayaXmlElement $node, $return, $term, $offset) {
 

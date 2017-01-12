@@ -1,6 +1,6 @@
 <?php
 
-class PapayaModuleSearchIndexerConnectorConnection {
+class PapayaModuleElasticsearchConnection {
 
   private $connection = NULL;
 
@@ -10,7 +10,7 @@ class PapayaModuleSearchIndexerConnectorConnection {
     $this->connection = @fopen($url, 'r', FALSE, $context);
 
     if (!$this->connection){
-      throw new PapayaModuleSearchIndexerConnectorConnectionException($url);
+      throw new PapayaModuleElasticsearchConnectionException($url);
     }
 
     return $this->connection;
@@ -19,7 +19,7 @@ class PapayaModuleSearchIndexerConnectorConnection {
   public function getContent() {
     $content = stream_get_contents($this->connection);
     if (!$content) {
-      throw new PapayaModuleSearchIndexerConnectorConnectionContentException();
+      throw new PapayaModuleElasticsearchConnectionContentException();
     }
 
     return $content;

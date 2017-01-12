@@ -1,12 +1,13 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: kersken
- * Date: 17.10.16
- * Time: 17:47
+ * User: faber
+ * Date: 11.01.17
+ * Time: 17:17
  */
 
-class PapayaModuleElasticsearchBoxEditorController extends PapayaUiControlCommandDialog {
+class PapayaModuleElasticsearchSuggestionResultPageEditorController
+    extends PapayaUiControlCommandDialog {
   /**
    * @var PapayaPluginEditableContent
    */
@@ -28,7 +29,7 @@ class PapayaModuleElasticsearchBoxEditorController extends PapayaUiControlComman
    * @param PapayaRequestParameters $context
    */
   public function __construct(
-    PapayaPluginEditableContent $content, PapayaRequestParameters $context
+      PapayaPluginEditableContent $content, PapayaRequestParameters $context
   ) {
     $this->_content = $content;
     $this->_context = $context;
@@ -64,11 +65,11 @@ class PapayaModuleElasticsearchBoxEditorController extends PapayaUiControlComman
       $this->getContent()->merge($this->dialog()->data());
     } elseif ($this->dialog()->isSubmitted()) {
       $this->papaya()->messages->dispatch(
-        new PapayaMessageDisplayTranslated(
-          PapayaMessage::SEVERITY_ERROR,
-          'Invalid input. Please check the field(s) "%s".',
-          array(implode(', ', $this->dialog()->errors()->getSourceCaptions()))
-        )
+          new PapayaMessageDisplayTranslated(
+              PapayaMessage::SEVERITY_ERROR,
+              'Invalid input. Please check the field(s) "%s".',
+              array(implode(', ', $this->dialog()->errors()->getSourceCaptions()))
+          )
       );
     }
 
@@ -105,37 +106,23 @@ class PapayaModuleElasticsearchBoxEditorController extends PapayaUiControlComman
     $dialog->options->topButtons = TRUE;
 
     $dialog->hiddenValues()->merge(
-      array(
-        $this->parameterGroup() => array(
-          'cmd' => 'edit'
+        array(
+            $this->parameterGroup() => array(
+                'cmd' => 'edit'
+            )
         )
-      )
     );
 
     $dialog->parameterGroup($this->parameterGroup());
     $dialog->data()->merge($this->getContent());
     $dialog->hiddenValues->merge($this->_context);
 
-    $dialog->fields[] = $field = new PapayaUiDialogFieldInputPage(
-      new PapayaUiStringTranslated('Result page'), 'page_id', NULL, TRUE
-    );
     $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-      new PapayaUiStringTranslated('Search term caption'),
-      'caption_search_term',
-      100,
-      'Search term',
-      new PapayaFilterText()
-    );
-    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-      new PapayaUiStringTranslated('Submit button caption'),
-      'caption_submit',
-      100,
-      'Search',
-      new PapayaFilterText()
+        new PapayaUiStringTranslated('Results per page'), 'limit', 10, '10', new PapayaFilterInteger()
     );
 
     $dialog->buttons[] = new PapayaUiDialogButtonSubmit(
-      new PapayaUiStringTranslated($buttonCaption)
+        new PapayaUiStringTranslated($buttonCaption)
     );
     return $dialog;
   }

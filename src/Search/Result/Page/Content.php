@@ -12,7 +12,7 @@
  * FOR A PARTICULAR PURPOSE.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
  */
 
@@ -22,21 +22,21 @@
  * The result page content class does the actual querying and result displaying.
  *
  * @package Papaya-Modules
- * @subpackage SearchIndexer
+ * @subpackage Elasticsearch
  */
-class PapayaModuleSearchIndexerResultPageContent {
+class PapayaModuleElasticsearchSearchResultPageContent {
   /**
-   * @var PapayaModuleSearchIndexerResultPage
+   * @var PapayaModuleElasticsearchSearchResultPage
    */
   private $_owner = NULL;
-  private $searchConnector = NULL;
-  private $paging = NULL;
-  private $results = NULL;
+  private $_searchWorker = NULL;
+  private $_paging = NULL;
+  private $_results = NULL;
 
   /**
-   * @param PapayaModuleSearchIndexerResultPage $owner
+   * @param PapayaModuleElasticsearchSearchResultPage $owner
    */
-  public function __construct(PapayaModuleSearchIndexerResultPage $owner) {
+  public function __construct(PapayaModuleElasticsearchSearchResultPage $owner) {
     $this->_owner = $owner;
   }
 
@@ -48,7 +48,7 @@ class PapayaModuleSearchIndexerResultPageContent {
   }
 
   /**
-   * @return PapayaModuleSearchIndexerResultPage
+   * @return PapayaModuleElasticsearchSearchResultPage
    */
   public function getOwner() {
     return $this->_owner;
@@ -68,8 +68,8 @@ class PapayaModuleSearchIndexerResultPageContent {
     if (!empty($term)) {
 
       try {
-        $return = $this->searchConnector()->search($term, $language, $limit, $offset);
-      } catch (PapayaModuleSearchIndexerConnectorException $e) {
+        $return = $this->searchWorker()->search($term, $language, $limit, $offset);
+      } catch (PapayaModuleElasticsearchException $e) {
         $result->appendElement(
             'results',
             ['found' => 'false', 'term' => $term]
@@ -107,43 +107,43 @@ class PapayaModuleSearchIndexerResultPageContent {
   }
 
   /**
-   * @param PapayaModuleSearchIndexerConnectorSearch $searchConnector
-   * @return PapayaModuleSearchIndexerConnectorSearch
+   * @param PapayaModuleElasticsearchSearchWorker $searchWorker
+   * @return PapayaModuleElasticsearchSearchWorker
    */
-  public function searchConnector(PapayaModuleSearchIndexerConnectorSearch $searchConnector = NULL) {
-    if (isset($searchConnector)) {
-      $this->searchConnector = $searchConnector;
-    } else if (is_null($this->searchConnector)) {
-      $this->searchConnector = new PapayaModuleSearchIndexerConnectorSearch();
-      $this->searchConnector->papaya($this->getOwner()->papaya());
+  public function searchWorker(PapayaModuleElasticsearchSearchWorker $searchWorker = NULL) {
+    if (isset($searchWorker)) {
+      $this->_searchWorker = $searchWorker;
+    } else if (is_null($this->_searchWorker)) {
+      $this->_searchWorker = new PapayaModuleElasticsearchSearchWorker();
+      $this->_searchWorker->papaya($this->getOwner()->papaya());
     }
-    return $this->searchConnector;
+    return $this->_searchWorker;
   }
 
   /**
-   * @param PapayaModuleSearchIndexerResultPageContentPaging $paging
-   * @return PapayaModuleSearchIndexerResultPageContentPaging
+   * @param PapayaModuleElasticsearchSearchResultPageContentPaging $paging
+   * @return PapayaModuleElasticsearchSearchResultPageContentPaging
    */
-  public function paging(PapayaModuleSearchIndexerResultPageContentPaging $paging = NULL) {
+  public function paging(PapayaModuleElasticsearchSearchResultPageContentPaging $paging = NULL) {
     if (isset($paging)) {
-      $this->paging = $paging;
-    } else if (is_null($this->paging)) {
-      $this->paging = new PapayaModuleSearchIndexerResultPageContentPaging();
-      $this->paging->papaya($this->getOwner()->papaya());
+      $this->_paging = $paging;
+    } else if (is_null($this->_paging)) {
+      $this->_paging = new PapayaModuleElasticsearchSearchResultPageContentPaging();
+      $this->_paging->papaya($this->getOwner()->papaya());
     }
-    return $this->paging;
+    return $this->_paging;
   }
 
   /**
-   * @param PapayaModuleSearchIndexerResultPageContentResults $results
-   * @return PapayaModuleSearchIndexerResultPageContentResults
+   * @param PapayaModuleElasticsearchSearchResultPageContentResults $results
+   * @return PapayaModuleElasticsearchSearchResultPageContentResults
    */
-  public function results(PapayaModuleSearchIndexerResultPageContentResults $results = NULL) {
+  public function results(PapayaModuleElasticsearchSearchResultPageContentResults $results = NULL) {
     if (isset($results)) {
-      $this->results = $results;
-    } else if (is_null($this->results)) {
-      $this->results = new PapayaModuleSearchIndexerResultPageContentResults();
+      $this->_results = $results;
+    } else if (is_null($this->_results)) {
+      $this->_results = new PapayaModuleElasticsearchSearchResultPageContentResults();
     }
-    return $this->results;
+    return $this->_results;
   }
 }

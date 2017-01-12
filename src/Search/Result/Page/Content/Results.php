@@ -26,14 +26,15 @@ class PapayaModuleElasticsearchSearchResultPageContentResults {
       } else {
         $content = substr($hit->_source->content, 0, 200);
       }
-      $results->appendElement(
+      $oneResult = $results->appendElement(
           'result',
           [
               'url' => $hit->_source->url,
-              'title' => $hit->_source->title,
-              'content' => $content
+              'title' => $hit->_source->title
           ]
       );
+
+      $oneResult->appendXml($content);
     }
   }
 }

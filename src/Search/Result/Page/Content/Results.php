@@ -30,7 +30,8 @@ class PapayaModuleElasticsearchSearchResultPageContentResults {
           'result',
           [
               'url' => $hit->_source->url,
-              'title' => $hit->_source->title
+              'title' => $hit->_source->title,
+              'score' => $this->_score
           ]
       );
 

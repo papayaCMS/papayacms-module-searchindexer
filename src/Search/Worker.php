@@ -39,6 +39,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
                   'fields' => ['title^2', 'content']
               ]
           ],
+          'sort' => [ '_score' => [ 'order' => 'desc' ]],
           'highlight' => [
               'fields' => [
                   'content' => new stdClass()

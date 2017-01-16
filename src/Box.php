@@ -37,6 +37,7 @@ implements
   private $_content = NULL;
 
   private $_cacheDefinition = NULL;
+  private $_moduleOptions = NULL;
 
   /**
    * Append the page output xml to the DOM.
@@ -64,6 +65,15 @@ implements
       $this->content()->get('caption_submit', 'Submit')
     );
     $parent->append($dialog);
+
+    $host = $this->option('ELASTICSEARCH_HOST', 'localhost');
+    $port = $this->option('ELASTICSEARCH_PORT', 9200);
+    $index = $this->option('ELASTICSEARCH_INDEX', 'index');
+    $language = $this->papaya()->request->languageIdentifier;
+
+    $url = sprintf("http://%s:%d/%s/%s/_suggest", $host, $port, $index, $language);
+
+    $parent->appendElement('suggest', array('url' => $url));
   }
 
   /**
@@ -118,5 +128,19 @@ implements
       );
     }
     return $this->_cacheDefinition;
+  }
+
+  /**
+   * Get a module option
+   *
+   * @param string $option
+   * @param mixed $default optional, default value NULL
+   * @return mixed
+   */
+  public function option($option, $default = NULL) {
+    if ($this->_moduleOptions === NULL) {
+      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleElasticsearchSuggestionConnector::MODULE_GUID];
+    }
+    return $this->_moduleOptions->get($option, $default);
   }
 }

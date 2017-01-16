@@ -19,7 +19,6 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
     $host = $this->option('ELASTICSEARCH_HOST', 'localhost');
     $port = $this->option('ELASTICSEARCH_PORT', 9200);
     $index = $this->option('ELASTICSEARCH_INDEX', 'index');
-    $suggestion = $this->option('ELASTICSEARCH_SUGGESTION', 'suggestion');
     $url = sprintf("http://%s:%d/%s/%s/_suggest", $host, $port, $index, $language);
 
     if (!empty($term)) {
@@ -31,19 +30,10 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
       }
 
       $rawQuery = [
-          $suggestion => [
-              'title_suggest' => [
-                  'text' => $activeTerm,
-                  'completion' => [
-                      'field' => 'title_suggest'
-                  ]
-              ],
-              'content_suggest' => [
-                  'text' => $activeTerm,
-                  'completion' => [
-
-                      'field' => 'content_suggest'
-                  ]
+          $index => [
+              'text' => $activeTerm,
+              'completion' => [
+                  'field' => 'content_suggest'
               ]
           ]
       ];

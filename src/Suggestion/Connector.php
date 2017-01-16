@@ -64,13 +64,6 @@ class PapayaModuleElasticsearchSuggestionConnector extends base_connector {
           'input',
           100
       ],
-      'ELASTICSEARCH_SUGGESTION' => [
-          'ElasticSearch suggestion',
-          'isSomeText',
-          TRUE,
-          'input',
-          100
-      ],
       'OUTPUT_MODE' => [
           'Output Mode',
           'isSomeText',

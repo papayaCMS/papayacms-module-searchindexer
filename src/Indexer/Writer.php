@@ -61,9 +61,8 @@ class PapayaModuleElasticsearchIndexerWriter {
     $rawData = [
       'url' => $url,
       'title' => $title,
-      'content' => $this->prepareContent($content)//,
-      //'title_suggest' => $title,
-      //'content_suggest' => $this->prepareContent($content)
+      'content' => $this->prepareContent($content),
+      'content_suggest' => [ 'input' => $this->getKeywordsFromContent($this->prepareContent($content)) ]
     ];
     $data = json_encode($rawData);
     $searchItemId = $topicId;
@@ -154,6 +153,25 @@ class PapayaModuleElasticsearchIndexerWriter {
     $content = preg_replace("(([\r ]*\n[\r ]*)+)", "\n", $content);
     $content = preg_replace("( +)", " ", $content);
     return trim($content);
+  }
+
+  protected function getKeywordsFromContent($content) {
+    $json = ['none'];
+    preg_match_all('(\b\p{Lu}\pL{3,})u', $content, $matches);
+
+    $keywords = $matches[0];
+    if (count($keywords) > 0) {
+      $uniqueKeywords = array();
+      foreach ($keywords as $word) {
+        if (!in_array($word, $uniqueKeywords)) {
+          $uniqueKeywords[] = $word;
+        }
+      }
+    }
+    if (count($uniqueKeywords) > 0) {
+      $json = $uniqueKeywords;
+    }
+    return $json;
   }
 
   /**

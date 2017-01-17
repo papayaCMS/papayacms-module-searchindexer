@@ -50,7 +50,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
       $rawQuery = [
           'suggest' => [
               'didYouMean' => [
-                  'text' => '*patie*',
+                  'text' => $activeTerm,
                   'phrase' => [
                        'field' => 'did_you_mean'
                   ]
@@ -60,7 +60,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
           'size' => $limit,
           'query' => [
               'query_string' => [
-                  'query' => '*'.$activeTerm.'*',
+                  'query' => $activeTerm,
                   'fields' => [ 'title^2', 'content' ]
               ]
           ],
@@ -75,6 +75,8 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
               ]
           ]
       ];
+
+      //var_dump($rawQuery);
 
       $query = json_encode($rawQuery);
       $options = [

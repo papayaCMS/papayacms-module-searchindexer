@@ -73,7 +73,10 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
         return;
       }
 
-      //TODO implement page output if result is not empty
+      $result->appendElement(
+          'results',
+          ['found' => 'true', 'term' => $term, 'content' => json_encode($return)]
+      );
     }
   }
 

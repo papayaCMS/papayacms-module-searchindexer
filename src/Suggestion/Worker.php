@@ -50,7 +50,7 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
                 '_count' => 'desc'
               ],
               'include' => [
-                'pattern' => $activeTerm.'.*'
+                'pattern' => $term.'.*'
               ]
             ]
           ]
@@ -58,7 +58,7 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
         'query' => [
           'prefix' => [
             'autocomplete' => [
-              'value' => $activeTerm
+              'value' => $term
             ]
           ]
         ]

@@ -123,6 +123,13 @@ class PapayaModuleElasticsearchBoxEditorController extends PapayaUiControlComman
         new PapayaUiStringTranslated('Suggest page'), 'suggest_page_id', NULL, TRUE
     );
     $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
+        new PapayaUiStringTranslated('Output mode'),
+        'output_mode',
+        100,
+        'json',
+        new PapayaFilterText()
+    );
+    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
       new PapayaUiStringTranslated('Search term caption'),
       'caption_search_term',
       100,

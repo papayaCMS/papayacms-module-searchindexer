@@ -71,6 +71,7 @@ implements
         $this->papaya()->request->languageIdentifier,
         $this->content()->get('suggest_page_id', 1)
     );
+    $reference->setOutputMode($this->content()->get('output_mode', 'json'));
     $reference->setParameters(['term' => '']);
 
     $boxXml->appendElement('suggest', array('url' => $reference->get()));

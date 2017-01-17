@@ -30,7 +30,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
       if (!preg_match('(\s)', $activeTerm)) {
         $activeTerm = sprintf('*%s*', $activeTerm);
       }
-      $rawQuery = [
+      /*$rawQuery = [
           'from' => $offset,
           'size' => $limit,
           'query' => [
@@ -45,7 +45,37 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
                   'content' => new stdClass()
               ]
           ]
+      ];*/
+
+      $rawQuery = [
+          'suggest' => [
+              'didYouMean' => [
+                  'text' => '*patie*',
+                  'phrase' => [
+                       'field' => 'did_you_mean'
+                  ]
+              ]
+          ],
+          'from' => $offset,
+          'size' => $limit,
+          'query' => [
+              'query_string' => [
+                  'query' => '*'.$activeTerm.'*',
+                  'fields' => [ 'title^2', 'content' ]
+              ]
+          ],
+          'sort' => [
+              '_score' => [
+                  'order' => 'desc'
+              ]
+          ],
+          'highlight' => [
+              'fields' => [
+                  'content' => new stdClass()
+              ]
+          ]
       ];
+
       $query = json_encode($rawQuery);
       $options = [
           'http' => [

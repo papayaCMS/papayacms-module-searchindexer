@@ -19,7 +19,9 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
     $host = $this->option('ELASTICSEARCH_HOST', 'localhost');
     $port = $this->option('ELASTICSEARCH_PORT', 9200);
     $index = $this->option('ELASTICSEARCH_INDEX', 'index');
-    $url = sprintf("http://%s:%d/%s/%s/_suggest", $host, $port, $index, $language);
+    //$url = sprintf("http://%s:%d/%s/%s/_suggest", $host, $port, $index, $language);
+
+    $url = sprintf("http://%s:%d/%s/%s/_search", $host, $port, $index, $language);
 
     if (!empty($term)) {
       $term = preg_replace('(^\W+)u', '', $term);
@@ -29,14 +31,39 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
         $activeTerm = sprintf('*%s*', $activeTerm);
       }
 
-      $rawQuery = [
+      /*$rawQuery = [
           $index => [
               'text' => $activeTerm,
               'completion' => [
                   'field' => 'content_suggest'
               ]
           ]
+      ];*/
+
+      $rawQuery = [
+        'size'=> 0,
+        'aggs'=> [
+          'autocomplete' => [
+            'terms' => [
+              'field' => 'autocomplete',
+              'order' => [
+                '_count' => 'desc'
+              ],
+              'include' => [
+                'pattern' => $activeTerm.'.*'
+              ]
+            ]
+          ]
+        ],
+        'query' => [
+          'prefix' => [
+            'autocomplete' => [
+              'value' => $activeTerm
+            ]
+          ]
+        ]
       ];
+
       $query = json_encode($rawQuery);
       $options = [
           'http' => [

@@ -64,16 +64,16 @@ implements
     $dialog->buttons[] = new PapayaUiDialogButtonSubmit(
       $this->content()->get('caption_submit', 'Submit')
     );
-    $parent->append($dialog);
+    $boxXml = $parent->appendElement('elastic-search-box');
+    $boxXml->append($dialog);
 
-    $host = $this->option('ELASTICSEARCH_HOST', 'localhost');
-    $port = $this->option('ELASTICSEARCH_PORT', 9200);
-    $index = $this->option('ELASTICSEARCH_INDEX', 'index');
-    $language = $this->papaya()->request->languageIdentifier;
+    $reference = $this->papaya()->pageReferences->get(
+        $this->papaya()->request->languageIdentifier,
+        $this->content()->get('suggest_page_id', 1)
+    );
+    $reference->setParameters(['term' => '']);
 
-    $url = sprintf("http://%s:%d/%s/%s/_suggest", $host, $port, $index, $language);
-
-    $parent->appendElement('suggest', array('url' => $url));
+    $boxXml->appendElement('suggest', array('url' => $reference->get()));
   }
 
   /**

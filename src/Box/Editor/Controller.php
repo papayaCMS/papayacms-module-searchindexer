@@ -119,6 +119,9 @@ class PapayaModuleElasticsearchBoxEditorController extends PapayaUiControlComman
     $dialog->fields[] = $field = new PapayaUiDialogFieldInputPage(
       new PapayaUiStringTranslated('Result page'), 'page_id', NULL, TRUE
     );
+    $dialog->fields[] = $field = new PapayaUiDialogFieldInputPage(
+        new PapayaUiStringTranslated('Suggest page'), 'suggest_page_id', NULL, TRUE
+    );
     $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
       new PapayaUiStringTranslated('Search term caption'),
       'caption_search_term',

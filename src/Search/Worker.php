@@ -26,7 +26,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
     if (!empty($term)) {
       $term = preg_replace('(^\W+)u', '', $term);
       $term = preg_replace('(\W+$)u', '', $term);
-      $activeTerm = $term;
+      $activeTerm = strtolower($term);
       if (!preg_match('(\s)', $activeTerm)) {
         $activeTerm = sprintf('*%s*', $activeTerm);
       }

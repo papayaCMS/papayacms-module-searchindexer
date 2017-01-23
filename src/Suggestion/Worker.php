@@ -27,11 +27,12 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
       $term = preg_replace('(^\W+)u', '', $term);
       $term = preg_replace('(\W+$)u', '', $term);
       $activeTerm = $term;
-      if (!preg_match('(\s)', $activeTerm)) {
+
+      /*if (!preg_match('(\s)', $activeTerm)) {
         $activeTerm = sprintf('*%s*', $activeTerm);
       }
 
-      /*$rawQuery = [
+      $rawQuery = [
           $index => [
               'text' => $activeTerm,
               'completion' => [
@@ -39,6 +40,8 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
               ]
           ]
       ];*/
+
+      $term = strtolower($term);
 
       $rawQuery = [
         'size'=> 0,

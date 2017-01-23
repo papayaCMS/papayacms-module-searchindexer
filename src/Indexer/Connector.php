@@ -62,6 +62,13 @@ class PapayaModuleElasticsearchIndexerConnector extends base_connector {
           'input',
           100
       ],
+      'PAGE_CONTENT_CONTAINER' => [
+          'Content container',
+          'isSomeText',
+          FALSE,
+          'input',
+          100
+      ],
       'OUTPUT_MODE' => [
           'Output Mode',
           'isSomeText',

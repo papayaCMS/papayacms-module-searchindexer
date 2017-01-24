@@ -161,6 +161,7 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $reference->setPreview(FALSE);
     $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
     $url = $reference->get();
+    //$url = str_replace('1080', '80', $url);
     $options = [
       'http' => [
         'method' => 'GET',
@@ -205,10 +206,16 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
         if (isset($titles[$topicId])) {
           $title = $titles[$topicId];
         }
-        $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
-        $status = $result ? 'success' : 'error';
-        $searchItemId = $result ? $result : $this->lastSearchItemId();
-        $this->setIndexed($topicId, $languageId, $searchItemId, $status);
+        $content = $this->takeContent($content);
+        if (is_null($content)) {
+          $status = 'no-content';
+          $this->setIndexed($topicId, $languageId, $topicId, $status);
+        } else {
+          $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
+          $status = $result ? 'success' : 'error';
+          $searchItemId = $result ? $result : $this->lastSearchItemId();
+          $this->setIndexed($topicId, $languageId, $searchItemId, $status);
+        }
         break;
       } elseif (!$goOn) {
         $this->setIndexed(
@@ -222,6 +229,20 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
       }
     } while ($goOn);
     return $result;
+  }
+
+  public function takeContent($html) {
+    $document = new PapayaXmlDocument();
+    $document->loadHtml($html);
+
+    $id = $this->option('PAGE_CONTENT_CONTAINER', '');
+
+    if ($id != '') {
+      $xPath = $document->xpath();
+      $text = $xPath->evaluate('string(//*[@id="'.$id.'"])');
+      return ($text != '') ? $text : null;
+    }
+    return $html;
   }
 
   /**

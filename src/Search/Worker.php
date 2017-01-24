@@ -27,6 +27,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
       $term = preg_replace('(^\W+)u', '', $term);
       $term = preg_replace('(\W+$)u', '', $term);
       $activeTerm = strtolower($term);
+      $exactlyTerm = $activeTerm;
       if (!preg_match('(\s)', $activeTerm)) {
         $activeTerm = sprintf('*%s*', $activeTerm);
       }
@@ -60,7 +61,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
           'size' => $limit,
           'query' => [
               'query_string' => [
-                  'query' => $activeTerm,
+                  'query' => $activeTerm.' or '.$exactlyTerm,
                   'fields' => [ 'title^2', 'content' ]
               ]
           ],

@@ -143,7 +143,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
    */
   public function option($option, $default = NULL) {
     if ($this->_moduleOptions === NULL) {
-      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleElasticsearchIndexerConnector::MODULE_GUID];
+      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleElasticsearchSearchConnector::MODULE_GUID];
     }
     return $this->_moduleOptions->get($option, $default);
   }

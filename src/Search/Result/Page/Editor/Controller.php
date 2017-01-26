@@ -128,6 +128,14 @@ class PapayaModuleElasticsearchSearchResultPageEditorController
         new PapayaUiStringTranslated('Paging range'), 'paging_range', 10, '3', new PapayaFilterInteger()
     );
 
+    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
+        new PapayaUiStringTranslated('Empty result'), 'empty_result', 255, 'Nothing found.', new PapayaFilterText()
+    );
+
+    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
+        new PapayaUiStringTranslated('Connection probelm'), 'connection_problem', 255, 'Connection problem.', new PapayaFilterText()
+    );
+
     $dialog->buttons[] = new PapayaUiDialogButtonSubmit(
       new PapayaUiStringTranslated($buttonCaption)
     );

@@ -75,6 +75,11 @@ class PapayaModuleElasticsearchSearchResultPageContent {
             'results',
             ['found' => 'false', 'term' => $term]
         );
+        $result->appendElement(
+            'message',
+            [],
+            $this->getOwner()->content()->get('connection_problem', 'Connection problem.')
+        );
         $e->appendTo($result->appendElement('error'));
         return;
       }
@@ -94,7 +99,7 @@ class PapayaModuleElasticsearchSearchResultPageContent {
         $result->appendElement(
             'message',
             [],
-            'Nothing found.'
+            $this->getOwner()->content()->get('empty_result', 'Nothing found.')
         );
       }
     }

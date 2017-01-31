@@ -107,4 +107,26 @@ Skipped (errors): %d\n",
     }
     return $this->_worker;
   }
+
+
+  /**
+   * Check execution parameters
+   *
+   * @return bool|string
+   */
+  public function checkExecParams() {
+    $result = FALSE;
+    $this->setDefaultData();
+    if ($this->data['indexed_timestamp'] > 0 && $this->data['error_timestamp'] > 0) {
+      $result = sprintf(
+        "Pages: %d, error pages: %d\n",
+        $this->data['indexed_timestamp'],
+        $this->data['error_timestamp']
+      );
+      if ($this->data['error_timestamp'] <= $this->data['indexed_timestamp']) {
+        $result .= "Warning: Reindex error pages should be greater than reindex value.\n";
+      }
+    }
+    return $result;
+  }
 }

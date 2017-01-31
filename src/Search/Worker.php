@@ -61,7 +61,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
           'size' => $limit,
           'query' => [
               'query_string' => [
-                  'query' => $activeTerm.' or '.$exactlyTerm,
+                  'query' => $activeTerm.' OR '.$exactlyTerm,
                   'fields' => [ 'title^2', 'content' ]
               ]
           ],

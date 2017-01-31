@@ -6,7 +6,7 @@
  * Time: 17:43
  */
 
-class PapayaModuleElasticsearchBoxEditor extends PapayaPluginEditor {
+class PapayaModuleElasticsearchSearchResultPageEditor extends PapayaPluginEditor {
   /**
    * @var PapayaUiControlCommandController
    */
@@ -32,7 +32,7 @@ class PapayaModuleElasticsearchBoxEditor extends PapayaPluginEditor {
       $pageContent = $this->getContent();
       $this->_commands = new PapayaUiControlCommandController('cmd', 'edit');
       $this->_commands->owner($this);
-      $this->_commands['edit'] = new PapayaModuleElasticsearchBoxEditorController(
+      $this->_commands['edit'] = new PapayaModuleElasticsearchSearchResultPageEditorController(
         $pageContent,
         $this->context()
       );

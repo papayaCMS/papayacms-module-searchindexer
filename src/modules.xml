@@ -1,41 +1,55 @@
 <?xml version="1.0"  encoding="ISO-8859-1" ?>
 <modulegroup>
-  <name>Search Indexer</name>
+  <name>Elasticsearch</name>
   <description>Update your internal search engine's index on page or content publication</description>
-  <prefix>PapayaModuleSearchIndexer</prefix>
+  <prefix>PapayaModuleElasticsearch</prefix>
   <modules>
     <module type="connector"
             guid="1eb06c29ba114ca2804be4bda69375e7"
             name="Elasticsearch Indexer Connector"
-            class="PapayaModuleSearchIndexerConnectorIndexer"
-            file="Connector/Indexer.php">
+            class="PapayaModuleElasticsearchIndexerConnector"
+            file="Indexer/Connector.php">
       The connector is the public interface to trigger index updates.
     </module>
     <module type="connector"
             guid="0a6800488f9760b93dd9ff17ee03c28a"
             name="Elasticsearch Search Connector"
-            class="PapayaModuleSearchIndexerConnectorSearch"
-            file="Connector/Search.php">
+            class="PapayaModuleElasticsearchSearchConnector"
+            file="Search/Connector.php">
       The connector is the public interface to search results.
+    </module>
+    <module type="connector"
+            guid="926252bf16335cc2c9d6e94da0f417ea"
+            name="Elasticsearch Suggestion Connector"
+            class="PapayaModuleElasticsearchSuggestionConnector"
+            file="Suggestion/Connector.php">
+      The connector is the public interface to suggestion results.
     </module>
     <module type="cronjob"
             guid="489a82a6ecd2ea67bb90f0775c7e1086"
-            name="Search Indexer Cronjob"
-            class="PapayaModuleSearchIndexerCronjob"
-            file="Cronjob.php">
+            name="Elastcsearch Indexer Cronjob"
+            class="PapayaModuleElasticsearchIndexerCronjob"
+            file="Indexer/Cronjob.php">
       Regularly index all pages of the project.
     </module>
     <module type="page"
             guid="649a79d17080dcc13014c1225adf8d74"
-            name="Search Indexer Result Page"
-            class="PapayaModuleSearchIndexerResultPage"
-            file="Result/Page.php">
+            name="Elasticsearch Search Result Page"
+            class="PapayaModuleElasticsearchSearchResultPage"
+            file="Search/Result/Page.php">
+      The result page class displays results of a query to the search engine.
+    </module>
+    <module type="page"
+            guid="84668a9b4f9b88d779404cd749d6deee"
+            name="Elasticsearch Suggestion Result Page"
+            class="PapayaModuleElasticsearchSuggestionResultPage"
+            file="Suggestion/Result/Page.php">
       The result page class displays results of a query to the search engine.
     </module>
     <module type="box"
             guid="bdd5524bc71674d868cde340ec66fdc8"
-            name="Search Indexer Dialog Box"
-            class="PapayaModuleSearchIndexerBox"
+            name="Elasticsearch Dialog Box"
+            class="PapayaModuleElasticsearchBox"
             file="Box.php">
       The box class displays a simple search form.
     </module>

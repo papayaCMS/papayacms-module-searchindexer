@@ -6,7 +6,8 @@
  * Time: 17:47
  */
 
-class PapayaModuleElasticsearchBoxEditorController extends PapayaUiControlCommandDialog {
+class PapayaModuleElasticsearchSearchResultPageEditorController
+    extends PapayaUiControlCommandDialog {
   /**
    * @var PapayaPluginEditableContent
    */
@@ -116,32 +117,23 @@ class PapayaModuleElasticsearchBoxEditorController extends PapayaUiControlComman
     $dialog->data()->merge($this->getContent());
     $dialog->hiddenValues->merge($this->_context);
 
-    $dialog->fields[] = $field = new PapayaUiDialogFieldInputPage(
-      new PapayaUiStringTranslated('Result page'), 'page_id', NULL, TRUE
+    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
+        new PapayaUiStringTranslated('Title'), 'title', 255, '', new PapayaFilterText()
     );
-    $dialog->fields[] = $field = new PapayaUiDialogFieldInputPage(
-        new PapayaUiStringTranslated('Suggest page'), 'suggest_page_id', NULL, TRUE
+
+    $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
+      new PapayaUiStringTranslated('Results per page'), 'limit', 10, '10', new PapayaFilterInteger()
     );
     $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-        new PapayaUiStringTranslated('Output mode'),
-        'output_mode',
-        100,
-        'json',
-        new PapayaFilterText()
+        new PapayaUiStringTranslated('Paging range'), 'paging_range', 10, '3', new PapayaFilterInteger()
     );
+
     $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-      new PapayaUiStringTranslated('Search term caption'),
-      'caption_search_term',
-      100,
-      'Search term',
-      new PapayaFilterText()
+        new PapayaUiStringTranslated('Empty result'), 'empty_result', 255, 'Nothing found.', new PapayaFilterText()
     );
+
     $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-      new PapayaUiStringTranslated('Submit button caption'),
-      'caption_submit',
-      100,
-      'Search',
-      new PapayaFilterText()
+        new PapayaUiStringTranslated('Connection probelm'), 'connection_problem', 255, 'Connection problem.', new PapayaFilterText()
     );
 
     $dialog->buttons[] = new PapayaUiDialogButtonSubmit(

@@ -1,12 +1,12 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: kersken
- * Date: 17.10.16
- * Time: 17:43
+ * User: faber
+ * Date: 11.01.17
+ * Time: 17:16
  */
 
-class PapayaModuleElasticsearchBoxEditor extends PapayaPluginEditor {
+class PapayaModuleElasticsearchSuggestionResultPageEditor extends PapayaPluginEditor {
   /**
    * @var PapayaUiControlCommandController
    */
@@ -32,9 +32,9 @@ class PapayaModuleElasticsearchBoxEditor extends PapayaPluginEditor {
       $pageContent = $this->getContent();
       $this->_commands = new PapayaUiControlCommandController('cmd', 'edit');
       $this->_commands->owner($this);
-      $this->_commands['edit'] = new PapayaModuleElasticsearchBoxEditorController(
-        $pageContent,
-        $this->context()
+      $this->_commands['edit'] = new PapayaModuleElasticsearchSuggestionResultPageEditorController(
+          $pageContent,
+          $this->context()
       );
     }
     return $this->_commands;

@@ -1,6 +1,6 @@
 <?php
 /**
-* Search Indexer Box
+* Elasticsearch Box
 *
 * @copyright by dimensional GmbH, Cologne, Germany - All rights reserved.
 * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU General Public License, version 2
@@ -12,7 +12,7 @@
 * FOR A PARTICULAR PURPOSE.
 *
 * @package Papaya-Modules
-* @subpackage SearchIndexer
+* @subpackage Elasticsearch
 * @version $Id: Api.php 39861 2014-06-27 09:38:58Z kersken $
 */
 
@@ -22,9 +22,9 @@
 * The box class displays a simple search form.
 *
 * @package Papaya-Modules
-* @subpackage SearchIndexer
+* @subpackage Elasticsearch
 */
-class PapayaModuleSearchIndexerBox
+class PapayaModuleElasticsearchBox
 extends
   PapayaObjectInteractive
 implements
@@ -37,6 +37,7 @@ implements
   private $_content = NULL;
 
   private $_cacheDefinition = NULL;
+  private $_moduleOptions = NULL;
 
   /**
    * Append the page output xml to the DOM.
@@ -63,7 +64,17 @@ implements
     $dialog->buttons[] = new PapayaUiDialogButtonSubmit(
       $this->content()->get('caption_submit', 'Submit')
     );
-    $parent->append($dialog);
+    $boxXml = $parent->appendElement('elastic-search-box');
+    $boxXml->append($dialog);
+
+    $reference = $this->papaya()->pageReferences->get(
+        $this->papaya()->request->languageIdentifier,
+        $this->content()->get('suggest_page_id', 1)
+    );
+    $reference->setOutputMode($this->content()->get('output_mode', 'json'));
+    $reference->setParameters(['term' => '']);
+
+    $boxXml->appendElement('suggest', array('url' => $reference->get()));
   }
 
   /**
@@ -96,7 +107,7 @@ implements
    * @return PapayaPluginEditor
    */
   public function createEditor($callbackContext, PapayaPluginEditableContent $content) {
-    $editor = new PapayaModuleSearchIndexerBoxEditor($content);
+    $editor = new PapayaModuleElasticsearchBoxEditor($content);
     $editor->papaya($this->papaya());
     return $editor;
   }
@@ -118,5 +129,19 @@ implements
       );
     }
     return $this->_cacheDefinition;
+  }
+
+  /**
+   * Get a module option
+   *
+   * @param string $option
+   * @param mixed $default optional, default value NULL
+   * @return mixed
+   */
+  public function option($option, $default = NULL) {
+    if ($this->_moduleOptions === NULL) {
+      $this->_moduleOptions = $this->papaya()->plugins->options[PapayaModuleElasticsearchSuggestionConnector::MODULE_GUID];
+    }
+    return $this->_moduleOptions->get($option, $default);
   }
 }

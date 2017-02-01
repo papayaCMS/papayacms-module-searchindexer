@@ -71,6 +71,9 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
               ]
           ],
           'highlight' => [
+              "fragment_size" => 100,
+              "number_of_fragments" => 3,
+              "no_match_size" => 100,
               'fields' => [
                   'content' => new stdClass()
               ]

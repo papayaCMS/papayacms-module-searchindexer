@@ -29,6 +29,7 @@ class PapayaModuleElasticsearchSearchResultPageContentResults {
       $oneResult = $results->appendElement(
           'result',
           [
+              'id' => $hit->_id,
               'url' => $hit->_source->url,
               'title' => $hit->_source->title,
               'score' => $hit->_score

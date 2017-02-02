@@ -31,22 +31,6 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
       if (!preg_match('(\s)', $activeTerm)) {
         $activeTerm = sprintf('*%s*', $activeTerm);
       }
-      /*$rawQuery = [
-          'from' => $offset,
-          'size' => $limit,
-          'query' => [
-              'query_string' => [
-                  'query' => $activeTerm,
-                  'fields' => ['title^2', 'content']
-              ]
-          ],
-          'sort' => [ '_score' => [ 'order' => 'desc' ]],
-          'highlight' => [
-              'fields' => [
-                  'content' => new stdClass()
-              ]
-          ]
-      ];*/
 
       $rawQuery = [
           'suggest' => [
@@ -71,16 +55,14 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
               ]
           ],
           'highlight' => [
-              "fragment_size" => 100,
-              "number_of_fragments" => 3,
-              "no_match_size" => 100,
+              "fragment_size" => $this->option('FRAGMENT_SIZE', 100),
+              "number_of_fragments" => $this->option('NUMBER_OF_FRAGMENTS', 3),
+              "no_match_size" => $this->option('NO_MATCH_SIZE', 100),
               'fields' => [
                   'content' => new stdClass()
               ]
           ]
       ];
-
-      //var_dump($rawQuery);
 
       $query = json_encode($rawQuery);
       $options = [

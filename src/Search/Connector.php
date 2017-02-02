@@ -80,6 +80,34 @@ class PapayaModuleElasticsearchSearchConnector extends base_connector {
       30,
       '',
       'html'
+    ],
+
+    'FRAGMENT_SIZE' => [
+      'Fragment size',
+      'isNum',
+      TRUE,
+      'input',
+      30,
+      '',
+      '100'
+    ],
+    'NUMBER_OF_FRAGMENTS' => [
+      'Number of fragments',
+      'isNum',
+      TRUE,
+      'input',
+      30,
+      '',
+      '3'
+    ],
+    'NO_MATCH_SIZE' => [
+      'No match size',
+      'isNum',
+      TRUE,
+      'input',
+      30,
+      '',
+      '100'
     ]
   ];
 

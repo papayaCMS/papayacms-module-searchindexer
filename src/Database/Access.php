@@ -133,8 +133,11 @@ class PapayaModuleElasticsearchDatabaseAccess extends PapayaDatabaseObject {
    * @param string $searchItemId
    * @param string $status
    * @param string $comment optional, default value ''
+   * @param string $url optional, default value ''
+   * @param string $digest optional, default value ''
    */
-  public function setIndexed($topicId, $languageId, $searchItemId, $status, $comment = '') {
+  public function setIndexed($topicId, $languageId, $searchItemId, $status,
+                             $comment = '', $url = '', $digest = '') {
     $this->databaseDeleteRecord(
       $this->databaseGetTableName('search_indexer_status'),
       ['topic_id' => $topicId, 'language_id' => $languageId]
@@ -148,9 +151,36 @@ class PapayaModuleElasticsearchDatabaseAccess extends PapayaDatabaseObject {
         'search_item_id' => $searchItemId,
         'indexed' => time(),
         'status' => $status,
-        'comment' => $comment
+        'comment' => $comment,
+        'url' => $url,
+        'digest' => $digest
       ]
     );
+  }
+
+  /**
+   * Get index statuses by URL
+   *
+   * @param string $url
+   * @return array
+   */
+  public function getIndexStatusesByUrl($url) {
+    $result = [];
+    $sql = "SELECT topic_id, language_id, search_item_id,
+                   indexed, status, comment, url, digest
+              FROM %s
+             WHERE url = '%s'
+               AND status = 'success'";
+    $parameters = [
+      $this->databaseGetTableName('search_indexer_status'),
+      $url
+    ];
+    if ($res = $this->databaseQueryFmt($sql, $parameters)) {
+      while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+        $result[$row['topic_id']] = $row;
+      }
+    }
+    return $result;
   }
 
   /**

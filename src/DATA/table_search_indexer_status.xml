@@ -3,6 +3,8 @@
   <fields>
     <field name="topic_id" type="integer" size="4" null="no"/>
     <field name="language_id" type="integer" size="4" null="no"/>
+    <field name="url" type="string" size="255" null="no"/>
+    <field name="digest" type="string" size="255" null="no"/>
     <field name="search_item_id" type="string" size="255" null="no"/>
     <field name="indexed" type="integer" size="4" null="no"/>
     <field name="status" type="string" size="10" null="no"/>
@@ -14,5 +16,8 @@
       <field>language_id</field>
       <field>search_item_id</field>
     </primary-key>
+    <key>
+      <field>url</field>
+    </key>
   </keys>
 </table>

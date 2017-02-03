@@ -154,14 +154,12 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    * @return boolean
    */
   public function indexPage($topicId, $languageId) {
-
     $result = FALSE;
     $identifier = $this->getLanguageById($languageId);
     $reference = $this->papaya()->pageReferences->get($identifier, $topicId);
     $reference->setPreview(FALSE);
     $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
     $url = $reference->get();
-    //$url = str_replace('1080', '80', $url);
     $options = [
       'http' => [
         'method' => 'GET',
@@ -211,10 +209,36 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
           $status = 'no-content';
           $this->setIndexed($topicId, $languageId, $topicId, $status);
         } else {
-          $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
-          $status = $result ? 'success' : 'error';
-          $searchItemId = $result ? $result : $this->lastSearchItemId();
-          $this->setIndexed($topicId, $languageId, $searchItemId, $status);
+          $duplicate = FALSE;
+          $contentDigest = $this->getDigest($content);
+          $statuses = $this->databaseAccess()->getIndexStatusesByUrl($finalUrl);
+          foreach ($statuses as $pageId => $statusData) {
+            if ($finalUrl == $statusData['url'] &&
+                $contentDigest == $statusData['digest']) {
+              $duplicate = TRUE;
+              $this->setIndexed(
+                $topicId,
+                $languageId,
+                '',
+                'duplicate',
+                sprintf('Duplicate of page %d.', $statusData['topic_id'])
+              );
+              break;
+            }
+          }
+          if (!$duplicate) {
+            $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
+            $status = 'error';
+            $logUrl = '';
+            $logDigest = '';
+            if ($result) {
+              $status = 'success';
+              $searchItemId = $result ? $result : $this->lastSearchItemId();
+              $logUrl = $finalUrl;
+              $logDigest = $contentDigest;
+            }
+            $this->setIndexed($topicId, $languageId, $searchItemId, $status, '', $logUrl, $logDigest);
+          }
         }
         break;
       } elseif (!$goOn) {
@@ -231,6 +255,12 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     return $result;
   }
 
+  /**
+   * Retrieve the content from a content container if defined
+   *
+   * @param string $html
+   * @return mixed|null
+   */
   public function takeContent($html) {
     $document = new PapayaXmlDocument();
     $document->loadHtml($html);
@@ -240,7 +270,7 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     if ($id != '') {
       $xPath = $document->xpath();
       $text = $xPath->evaluate('string(//*[@id="'.$id.'"])');
-      return ($text != '') ? $text : null;
+      return ($text != '') ? $text : NULL;
     }
     return $html;
   }
@@ -279,9 +309,20 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    * @param string $searchItemId
    * @param string $status
    * @param string $comment optional, default value ''
+   * @param string $url optional, default value ''
+   * @param string $digest optional, default value ''
    */
-  public function setIndexed($topicId, $languageId, $searchItemId, $status, $comment = '') {
-    return $this->databaseAccess()->setIndexed($topicId, $languageId, $searchItemId, $status, $comment);
+  public function setIndexed($topicId, $languageId, $searchItemId, $status,
+                             $comment = '', $url = '', $digest = '') {
+    return $this->databaseAccess()->setIndexed(
+      $topicId,
+      $languageId,
+      $searchItemId,
+      $status,
+      $comment,
+      $url,
+      $digest
+    );
   }
 
   /**
@@ -440,5 +481,15 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $language = new PapayaContentLanguage();
     $language->load(['id' => $languageId]);
     return $language['identifier'];
+  }
+
+  /**
+   * Get a digest for a string
+   *
+   * @param string $text
+   * @return string
+   */
+  private function getDigest($text) {
+    return md5($text);
   }
 }

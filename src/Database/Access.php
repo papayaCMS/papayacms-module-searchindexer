@@ -78,7 +78,7 @@ class PapayaModuleElasticsearchDatabaseAccess extends PapayaDatabaseObject {
     $result = [];
     $sql = "SELECT topic_id, language_id, indexed
               FROM %s
-             WHERE status != 'error' ";
+             WHERE status = 'success' ";
     if ($timestamp !== NULL) {
       $sql .= "AND indexed >= $timestamp";
     }
@@ -107,7 +107,7 @@ class PapayaModuleElasticsearchDatabaseAccess extends PapayaDatabaseObject {
     $result = [];
     $sql = "SELECT topic_id, language_id
               FROM %s
-             WHERE status = 'error'";
+             WHERE status IN ('error', 'duplicate', 'no-content')";
     if ($timestamp !== NULL) {
       $sql .= " AND indexed >= $timestamp";
     }

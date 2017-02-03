@@ -1,6 +1,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <!--
-  @papaya:modules PapayaModuleSearchIndexerResultPage
+  @papaya:modules PapayaModuleElasticsearchSearchResultPage
 -->
 
 <xsl:import href="page_main.xsl" />
@@ -8,16 +8,19 @@
 <xsl:import href="../_lang/datetime.xsl" />
 
 <xsl:template name="content-area">
-  <h1><xsl:value-of select="/page/content/topic/title" /></h1>
+
+  <xsl:param name="topic" select="/page/content/topic" />
+
+  <h1><xsl:value-of select="$topic/title" /></h1>
   <xsl:choose>
-    <xsl:when test="search/error">
+    <xsl:when test="$topic/search/error">
       <div>
-        <p>Suche nach &quot;<xsl:value-of select="search/results/@term" />&quot;</p>
-        <p class="error"><xsl:value-of select="search/error/text()" /></p>
+        <p>Suche nach &quot;<xsl:value-of select="$topic/search/results/@term" />&quot;</p>
+        <p class="error"><xsl:value-of select="$topic/search/error/text()" /></p>
       </div>
     </xsl:when>
     <xsl:otherwise>
-      <xsl:for-each select="search/results">
+      <xsl:for-each select="$topic/search/results">
         <p class="searchResultsHead">
           <xsl:value-of select="@start" /> - <xsl:value-of select="@end" /> von <xsl:value-of select="@total" /> Ergebnissen für <strong>"<xsl:value-of select="@term" />"</strong>
           <span>sortiert nach: <em>Relevanz</em></span>
@@ -32,9 +35,19 @@
               </xsl:choose>
             </xsl:attribute>
             <h2><a href="{@url}"><xsl:value-of select="@title" /></a></h2>
-            <p>
-              <xsl:value-of select="@content" disable-output-escaping="yes" />
-            </p>
+            <xsl:choose>
+              <xsl:when test="count(fragment) &gt; 0">
+                <xsl:for-each select="fragment">
+                  <p><xsl:apply-templates select="node()" mode="richtext" /></p>
+                </xsl:for-each>
+              </xsl:when>
+              <xsl:otherwise>
+                <p>
+                  <xsl:apply-templates select="node()" mode="richtext" />
+                </p>
+              </xsl:otherwise>
+            </xsl:choose>
+
             <p>
               <a href="{@url}" class="more">Mehr...</a>
             </p>

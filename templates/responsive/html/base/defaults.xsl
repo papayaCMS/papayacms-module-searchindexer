@@ -143,8 +143,8 @@
                 <xsl:with-param name="groupClass">breadcrumb clearfix</xsl:with-param>
               </xsl:call-template>
             </xsl:if>
-            <div class="content">
-              <xsl:call-template name="content-area"/>
+            <div class="content" id="content-area">
+              <xsl:call-template name="content-area" />
             </div>
             <xsl:call-template name="box-group">
               <xsl:with-param name="boxes" select="boxes/box[@group = 'after-content']"/>

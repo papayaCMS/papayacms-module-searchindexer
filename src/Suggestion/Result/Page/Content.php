@@ -63,7 +63,11 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
     if (!empty($term)) {
 
       try {
-        $return = $this->suggestionWorker()->suggest($term, $language);
+        $return = $this->suggestionWorker()->suggest(
+            $term,
+            $language
+        );
+        $return = $this->prepareResults($return->aggregations->autocomplete->buckets);
       } catch (PapayaModuleElasticsearchException $e) {
         $result->appendElement(
             'results',
@@ -78,6 +82,64 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
           ['found' => 'true', 'term' => $term, 'content' => json_encode($return)]
       );
     }
+  }
+
+  public function prepareResults($bucketResults) {
+
+    $newBucketsResultsOneWord = [];
+
+    foreach ($bucketResults as $oneResult) {
+      if (count(explode(" ", $oneResult->key)) == 1) {
+        array_push($newBucketsResultsOneWord, $oneResult->key);
+      }
+    }
+
+    $newBucketsResults = [];
+
+    foreach ($bucketResults as $oneResult) {
+      if (count($newBucketsResults) == 0) {
+        array_push($newBucketsResults, $oneResult->key);
+      } else {
+        $match = false;
+        foreach ($newBucketsResults as $key => $oneElement) {
+          if (strpos($oneResult->key, $oneElement) !== FALSE && strlen($oneResult->key) > strlen($oneElement)) {
+            $newBucketsResults[$key] = $oneResult->key;
+            $match = true;
+            break;
+          }
+        }
+        if ($match == false) {
+          array_push($newBucketsResults, $oneResult->key);
+        }
+      }
+    }
+
+    $results = $newBucketsResultsOneWord;
+
+    foreach ($newBucketsResults as $oneResult) {
+      if ($this->inArray($newBucketsResultsOneWord, $oneResult) == false) {
+        array_push($results, $oneResult);
+      }
+    }
+
+    $resultLimited = [];
+    $counter = 0;
+    foreach ($results as $oneResult) {
+      if ($this->getOwner()->content()->get('prepared_limit', 0) > $counter++) {
+        array_push($resultLimited, $oneResult);
+      }
+    }
+
+    return $resultLimited;
+  }
+
+  public function inArray ($elements, $value) {
+    for ($i = 0; $i < count($elements); $i++) {
+      if (strtolower($elements[$i]) == strtolower($value)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

@@ -7,7 +7,7 @@
   <xsl:template match="/">
 
     <xsl:choose>
-      <xsl:when test="/page/content/topic/suggestion/results/@content = ''">
+      <xsl:when test="/page/content/topic/suggestion/results/@content != ''">
         <xsl:value-of select="/page/content/topic/suggestion/results/@content" />
       </xsl:when>
       <xsl:otherwise>

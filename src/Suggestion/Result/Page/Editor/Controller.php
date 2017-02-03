@@ -118,7 +118,7 @@ class PapayaModuleElasticsearchSuggestionResultPageEditorController
     $dialog->hiddenValues->merge($this->_context);
 
     $dialog->fields[] = $field = new PapayaUiDialogFieldInput(
-        new PapayaUiStringTranslated('Results per page'), 'limit', 10, '10', new PapayaFilterInteger()
+        new PapayaUiStringTranslated('Prepared limit'), 'prepared_limit', 10, '10', new PapayaFilterInteger()
     );
 
     $dialog->buttons[] = new PapayaUiDialogButtonSubmit(

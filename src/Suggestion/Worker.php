@@ -9,6 +9,7 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
   /**
    * @param string $term
    * @param $language
+   * @param $term
    * @return bool|http-result
    * @throws PapayaModuleElasticsearchException
    */
@@ -19,27 +20,12 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
     $host = $this->option('ELASTICSEARCH_HOST', 'localhost');
     $port = $this->option('ELASTICSEARCH_PORT', 9200);
     $index = $this->option('ELASTICSEARCH_INDEX', 'index');
-    //$url = sprintf("http://%s:%d/%s/%s/_suggest", $host, $port, $index, $language);
 
     $url = sprintf("http://%s:%d/%s/%s/_search", $host, $port, $index, $language);
 
     if (!empty($term)) {
       $term = preg_replace('(^\W+)u', '', $term);
       $term = preg_replace('(\W+$)u', '', $term);
-      $activeTerm = $term;
-
-      /*if (!preg_match('(\s)', $activeTerm)) {
-        $activeTerm = sprintf('*%s*', $activeTerm);
-      }
-
-      $rawQuery = [
-          $index => [
-              'text' => $activeTerm,
-              'completion' => [
-                  'field' => 'content_suggest'
-              ]
-          ]
-      ];*/
 
       $term = strtolower($term);
 
@@ -54,7 +40,8 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
               ],
               'include' => [
                 'pattern' => $term.'.*'
-              ]
+              ],
+              'size' => $this->option('SUGGESTER_LIMIT', 10)
             ]
           ]
         ],

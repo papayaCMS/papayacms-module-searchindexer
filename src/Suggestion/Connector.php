@@ -72,6 +72,15 @@ class PapayaModuleElasticsearchSuggestionConnector extends base_connector {
           30,
           '',
           'html'
+      ],
+      'SUGGESTER_LIMIT' => [
+          'Suggester limit',
+          'isNum',
+          TRUE,
+          'input',
+          30,
+          '',
+          '10'
       ]
   ];
 

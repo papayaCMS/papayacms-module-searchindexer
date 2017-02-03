@@ -16,7 +16,7 @@
       <field>language_id</field>
       <field>search_item_id</field>
     </primary-key>
-    <key>
+    <key name="url">
       <field>url</field>
     </key>
   </keys>

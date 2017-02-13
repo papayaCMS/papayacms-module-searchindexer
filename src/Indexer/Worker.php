@@ -80,11 +80,28 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    * Callback method to be called via action dispatcher whenever a specific page translation is unpublished
    */
   public function onUnpublishPage($data) {
-    $r = $this->writer()->removeFromIndex(
+    $result = $this->writer()->removeFromIndex(
       $data['topic_id'],
       $this->getLanguageById($data['lng_id'])
     );
-    return $r;
+    return $result;
+  }
+
+  /**
+   * Callback method to be called via action dispatcher whenever a lot of pages should be removed from index
+   * @param array $data
+   * @return boolean
+   */
+  public function onDeletePages($data) {
+    var_dump($data);
+    if (isset($data['topic_translations']) && is_array($data['topic_translations'])) {
+      $status = [];
+      foreach ($data['topic_translations'] as $onePage) {
+        $status[] = $this->onUnpublishPage($onePage);
+      }
+      return in_array(FALSE, $status) ? FALSE : TRUE;
+    }
+    return FALSE;
   }
 
   /**

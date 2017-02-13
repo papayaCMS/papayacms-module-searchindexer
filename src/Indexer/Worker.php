@@ -93,7 +93,6 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    * @return boolean
    */
   public function onDeletePages($data) {
-    var_dump($data);
     if (isset($data['topic_translations']) && is_array($data['topic_translations'])) {
       $status = [];
       foreach ($data['topic_translations'] as $onePage) {

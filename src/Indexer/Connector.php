@@ -107,6 +107,15 @@ class PapayaModuleElasticsearchIndexerConnector extends base_connector {
   }
 
   /**
+   * Callback method to be called via action dispatcher whenever a lot of pages should be removed from index
+   * @param array $data
+   * @return boolean
+   */
+  public function onDeletePages($data) {
+    return $this->worker()->onDeletePages($data);
+  }
+
+  /**
    * Add content and its URL to the index
    *
    * @param int $topicId Page ID

@@ -159,21 +159,24 @@ class PapayaModuleElasticsearchDatabaseAccess extends PapayaDatabaseObject {
   }
 
   /**
-   * Get index statuses by URL
+   * Get index statuses by URL or digest
    *
    * @param string $url
+   * @param string $digest
    * @return array
    */
-  public function getIndexStatusesByUrl($url) {
+  public function getIndexStatusesByUrlOrDigest($url, $digest) {
     $result = [];
     $sql = "SELECT topic_id, language_id, search_item_id,
                    indexed, status, comment, url, digest
               FROM %s
-             WHERE url = '%s'
+             WHERE (url = '%s'
+                OR digest = '%s')
                AND status = 'success'";
     $parameters = [
       $this->databaseGetTableName('search_indexer_status'),
-      $url
+      $url,
+      $digest
     ];
     if ($res = $this->databaseQueryFmt($sql, $parameters)) {
       while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {

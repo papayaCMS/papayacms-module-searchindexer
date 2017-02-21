@@ -227,7 +227,7 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
         } else {
           $duplicate = FALSE;
           $contentDigest = $this->getDigest($content);
-          $statuses = $this->databaseAccess()->getIndexStatusesByUrl($finalUrl);
+          $statuses = $this->databaseAccess()->getIndexStatusesByUrlOrDigest($finalUrl, $contentDigest);
           foreach ($statuses as $pageId => $statusData) {
             if ($finalUrl == $statusData['url'] ||
                 $contentDigest == $statusData['digest']) {

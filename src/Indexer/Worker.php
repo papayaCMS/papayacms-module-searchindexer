@@ -178,7 +178,7 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $url = $reference->get();
     $options = [
       'http' => [
-        'method' => 'GET',
+        'method' => 'POST',
         'header' => 'Connection: close'
       ]
     ];

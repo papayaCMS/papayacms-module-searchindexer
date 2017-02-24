@@ -1,14 +1,17 @@
 <?php
 require_once(__DIR__.'/bootstrap.php');
+require_once(__DIR__.'/../src/Indexer/Worker.php');
+require_once(__DIR__.'/../src/Indexer/Writer.php');
+require_once(__DIR__.'/../src/Connection.php');
 
-class PapayaModuleSearchIndexerWorkerTest extends PapayaTestCase {
+class PapayaModuleElasticsearchIndexerWorkerTest extends PapayaTestCase {
   /**
-   * @covers PapayaModuleSearchIndexerWorker::addToIndex
+   * @covers PapayaModuleElasticsearchIndexerWorker::addToIndex
    */
   public function testAddToIndex() {
-    $worker = new PapayaModuleSearchIndexerWorker();
+    $worker = new PapayaModuleElasticsearchIndexerWorker();
     $writer = $this
-      ->getMockBuilder('PapayaModuleSearchIndexerWriter')
+      ->getMockBuilder('PapayaModuleElasticsearchIndexerWriter')
       ->getMock();
     $writer
       ->expects($this->once())
@@ -19,10 +22,10 @@ class PapayaModuleSearchIndexerWorkerTest extends PapayaTestCase {
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerWorker::detectRedirection
+   * @covers PapayaModuleElasticsearchIndexerWorker::detectRedirection
    */
   public function testDetectRedirection() {
-    $worker = new PapayaModuleSearchIndexerWorker_TestProxy();
+    $worker = new PapayaModuleElasticsearchIndexerWorker_TestProxy();
     $this->assertEquals(
       'http://foo.example.com/',
       $worker->detectRedirection(
@@ -34,10 +37,10 @@ class PapayaModuleSearchIndexerWorkerTest extends PapayaTestCase {
     );
   }
   /**
-   * @covers PapayaModuleSearchIndexerWorker::searchStatus
+   * @covers PapayaModuleElasticsearchIndexerWorker::searchStatus
    */
   public function testSearchStatus() {
-    $worker = new PapayaModuleSearchIndexerWorker_TestProxy();
+    $worker = new PapayaModuleElasticsearchIndexerWorker_TestProxy();
     $this->assertEquals(
       302,
       $worker->searchStatus(
@@ -48,10 +51,10 @@ class PapayaModuleSearchIndexerWorkerTest extends PapayaTestCase {
     );
   }
   /**
-   * @covers PapayaModuleSearchIndexerWorker::searchLocation
+   * @covers PapayaModuleElasticsearchIndexerWorker::searchLocation
    */
   public function testSearchLocation() {
-    $worker = new PapayaModuleSearchIndexerWorker_TestProxy();
+    $worker = new PapayaModuleElasticsearchIndexerWorker_TestProxy();
     $this->assertEquals(
       'http://foo.example.com/',
       $worker->searchLocation(
@@ -63,10 +66,10 @@ class PapayaModuleSearchIndexerWorkerTest extends PapayaTestCase {
     );
   }
   /**
-   * @covers PapayaModuleSearchIndexerWorker::searchCookie
+   * @covers PapayaModuleElasticsearchIndexerWorker::searchCookie
    */
   public function testSearchCookie() {
-    $worker = new PapayaModuleSearchIndexerWorker_TestProxy();
+    $worker = new PapayaModuleElasticsearchIndexerWorker_TestProxy();
     $this->assertEquals(
       [
         'foo=bar',
@@ -84,29 +87,29 @@ class PapayaModuleSearchIndexerWorkerTest extends PapayaTestCase {
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerWorker::writer
+   * @covers PapayaModuleElasticsearchIndexerWorker::writer
    */
   public function testWriterSet() {
-    $worker = new PapayaModuleSearchIndexerWorker();
+    $worker = new PapayaModuleElasticsearchIndexerWorker();
     $writer = $this
-      ->getMockBuilder('PapayaModuleSearchIndexerWriter')
+      ->getMockBuilder('PapayaModuleElasticsearchIndexerWriter')
       ->getMock();
     $this->assertSame($writer, $worker->writer($writer));
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerWorker::writer
+   * @covers PapayaModuleElasticsearchIndexerWorker::writer
    */
   public function testWriterInitialize() {
-    $worker = new PapayaModuleSearchIndexerWorker();
-    $this->assertInstanceOf('PapayaModuleSearchIndexerWriter', $worker->writer());
+    $worker = new PapayaModuleElasticsearchIndexerWorker();
+    $this->assertInstanceOf('PapayaModuleElasticsearchIndexerWriter', $worker->writer());
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerWorker::pagesConnector
+   * @covers PapayaModuleElasticsearchIndexerWorker::pagesConnector
    */
   public function testPagesConnectorSet() {
-    $worker = new PapayaModuleSearchIndexerWorker();
+    $worker = new PapayaModuleElasticsearchIndexerWorker();
     $pagesConnector = $this
       ->getMockBuilder('PagesConnector')
       ->getMock();
@@ -114,10 +117,10 @@ class PapayaModuleSearchIndexerWorkerTest extends PapayaTestCase {
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerWorker::pagesConnector
+   * @covers PapayaModuleElasticsearchIndexerWorker::pagesConnector
    */
   public function testPagesConnectorGet() {
-    $worker = new PapayaModuleSearchIndexerWorker();
+    $worker = new PapayaModuleElasticsearchIndexerWorker();
     $pagesConnector = $this
       ->getMockBuilder('PagesConnector')
       ->getMock();
@@ -133,7 +136,7 @@ class PapayaModuleSearchIndexerWorkerTest extends PapayaTestCase {
   }
 }
 
-class PapayaModuleSearchIndexerWorker_TestProxy extends PapayaModuleSearchIndexerWorker {
+class PapayaModuleElasticsearchIndexerWorker_TestProxy extends PapayaModuleElasticsearchIndexerWorker {
   public function searchCookie($headers) {
     return parent::searchCookie($headers);
   }

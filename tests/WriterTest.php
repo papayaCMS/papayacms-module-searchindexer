@@ -1,23 +1,24 @@
 <?php
 require_once(__DIR__.'/bootstrap.php');
+require_once(__DIR__.'/../src/Indexer/Writer.php');
 
-class PapayaModuleSearchIndexerWriterTest extends PapayaTestCase {
+class PapayaModuleElasticsearchIndexerWriterTest extends PapayaTestCase {
   /**
-   * @covers PapayaModuleSearchIndexerWriter::owner
+   * @covers PapayaModuleElasticsearchIndexerWriter::owner
    */
   public function testOwner() {
-    $writer = new PapayaModuleSearchIndexerWriter();
+    $writer = new PapayaModuleElasticsearchIndexerWriter();
     $owner = $this
-      ->getMockBuilder('PapayaModuleSearchIndexerWorker')
+      ->getMockBuilder('PapayaModuleElasticsearchIndexerWorker')
       ->getMock();
     $this->assertSame($owner, $writer->owner($owner));
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerWriter::prepareContent
+   * @covers PapayaModuleElasticsearchIndexerWriter::prepareContent
    */
   public function testPrepareContent() {
-    $writer = new PapayaModuleSearchIndexerWriter_TestProxy();
+    $writer = new PapayaModuleElasticsearchIndexerWriter_TestProxy();
     $this->assertEquals(
       "Title Headline Line 1\nLine 2",
       $writer->prepareContent("<html><head><title>Title</title></head><body><h1>Headline</h1><p>Line 1
@@ -27,7 +28,7 @@ class PapayaModuleSearchIndexerWriterTest extends PapayaTestCase {
   }
 }
 
-class PapayaModuleSearchIndexerWriter_TestProxy extends PapayaModuleSearchIndexerWriter {
+class PapayaModuleElasticsearchIndexerWriter_TestProxy extends PapayaModuleElasticsearchIndexerWriter {
   public function prepareContent($content) {
     return parent::prepareContent($content);
   }

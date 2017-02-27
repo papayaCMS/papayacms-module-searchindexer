@@ -1,13 +1,16 @@
 <?php
 require_once(__DIR__.'/bootstrap.php');
-class PapayaModuleSearchIndexerConnectorTest extends PapayaTestCase {
+require_once(__DIR__.'/../src/Indexer/Connector.php');
+require_once(__DIR__.'/../src/Indexer/Worker.php');
+
+class PapayaModuleElasticsearchIndexerConnectorTest extends PapayaTestCase {
   /**
-   * @covers PapayaModuleSearchIndexerConnector::onPublishPage
+   * @covers PapayaModuleElasticsearchIndexerConnector::onPublishPage
    */
   public function testOnPublishPage() {
-    $connector = new PapayaModuleSearchIndexerConnector();
+    $connector = new PapayaModuleElasticsearchIndexerConnector();
     $worker = $this
-      ->getMockBuilder('PapayaModuleSearchIndexerWorker')
+      ->getMockBuilder('PapayaModuleElasticsearchIndexerWorker')
       ->getMock();
     $worker
       ->expects($this->once())
@@ -18,31 +21,31 @@ class PapayaModuleSearchIndexerConnectorTest extends PapayaTestCase {
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerConnector::worker
+   * @covers PapayaModuleElasticsearchIndexerConnector::worker
    */
   public function testWorkerSet() {
-    $connector = new PapayaModuleSearchIndexerConnector();
+    $connector = new PapayaModuleElasticsearchIndexerConnector();
     $worker = $this
-      ->getMockBuilder('PapayaModuleSearchIndexerWorker')
+      ->getMockBuilder('PapayaModuleElasticsearchIndexerWorker')
       ->getMock();
     $this->assertSame($worker, $connector->worker($worker));
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerConnector::worker
+   * @covers PapayaModuleElasticsearchIndexerConnector::worker
    */
   public function testWorkerGet() {
-    $connector = new PapayaModuleSearchIndexerConnector();
-    $this->assertInstanceOf('PapayaModuleSearchIndexerWorker', $connector->worker());
+    $connector = new PapayaModuleElasticsearchIndexerConnector();
+    $this->assertInstanceOf('PapayaModuleElasticsearchIndexerWorker', $connector->worker());
   }
 
   /**
-   * @covers PapayaModuleSearchIndexerConnector::option
+   * @covers PapayaModuleElasticsearchIndexerConnector::option
    */
   public function testOption() {
-    $connector = new PapayaModuleSearchIndexerConnector();
+    $connector = new PapayaModuleElasticsearchIndexerConnector();
     $worker = $this
-      ->getMockBuilder('PapayaModuleSearchIndexerWorker')
+      ->getMockBuilder('PapayaModuleElasticsearchIndexerWorker')
       ->getMock();
     $worker
       ->expects($this->once())

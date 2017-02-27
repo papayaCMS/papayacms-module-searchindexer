@@ -229,8 +229,10 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
           $contentDigest = $this->getDigest($content);
           $statuses = $this->databaseAccess()->getIndexStatusesByUrlOrDigest($finalUrl, $contentDigest);
           foreach ($statuses as $pageId => $statusData) {
-            if ($finalUrl == $statusData['url'] ||
-                $contentDigest == $statusData['digest']) {
+            if ($topicId != $pageId && (
+                  $finalUrl == $statusData['url'] ||
+                  $contentDigest == $statusData['digest'])
+               ) {
               $duplicate = TRUE;
               $this->setIndexed(
                 $topicId,

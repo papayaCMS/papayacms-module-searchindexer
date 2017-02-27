@@ -279,7 +279,9 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    */
   public function takeContent($html) {
     $document = new PapayaXmlDocument();
-    $document->loadHtml($html);
+    if ($document->loadHtml($html) == FALSE) {
+      return NULL;
+    }
 
     $id = $this->option('PAGE_CONTENT_CONTAINER', '');
 

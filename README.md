@@ -9,7 +9,7 @@ First steps for creating index and mapping on the elasticsearch end point:
 
 Step 1: create index with settings:
 
-    curl -XPUT 'http://host:9200/kzbvindex/' - d '
+    curl -XPUT 'http://host:9200/myindex/' - d '
     {
       "settings": {
         "index": {
@@ -20,8 +20,8 @@ Step 1: create index with settings:
                 "language": "german"
               },
               "autocompleteFilter": {
-                "max_shingle_size": "2",
-                "min_shingle_size": "2",
+                "max_shingle_size": "8",
+                "min_shingle_size": "3",
                 "type": "shingle",
                 "output_unigrams" : false
               },
@@ -76,7 +76,7 @@ Step 1: create index with settings:
 
 Step 2: create mapping on index:
     
-    curl -XPUT 'http://host:9200/kzbvindex/_mapping/de/' -d '
+    curl -XPUT 'http://host:9200/myindex/_mapping/de/' -d '
     {
       "de": {
         "properties": {
@@ -116,12 +116,12 @@ Step 3: start the indexer cronjob from package Elasticsearch
     
 if you need to delete index:
     
-    curl -XDELETE 'host:9200/kzbvindex'
+    curl -XDELETE 'host:9200/myindex'
     
     
 Manually search request
     
-    curl -XPOST 'http://192.168.50.15:9200/kzbvindex/de/_search/' -d '
+    curl -XPOST 'http://host:9200/myindex/de/_search/' -d '
     {
       "suggest": {
         "didYouMean": {
@@ -159,7 +159,7 @@ Manually search request
     
 Manually suggest request
     
-    curl -XPOST 'http://192.168.50.15:9200/kzbvindex/de/_search/' -d '
+    curl -XPOST 'http://host:9200/myindex/de/_search/' -d '
     {
       "size": 0,
       "aggs": {

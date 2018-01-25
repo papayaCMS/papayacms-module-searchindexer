@@ -9,7 +9,7 @@ First steps for creating index and mapping on the elasticsearch end point:
 
 Step 1: create index with settings:
 
-    curl -XPUT 'http://host:9200/myindex/' - d '
+    curl -XPUT 'http://host:9200/myindex/' -H 'Content-type: application/json' -d '
     {
       "settings": {
         "index": {
@@ -76,7 +76,7 @@ Step 1: create index with settings:
 
 Step 2: create mapping on index:
     
-    curl -XPUT 'http://host:9200/myindex/_mapping/de/' -d '
+    curl -XPUT 'http://host:9200/myindex/_mapping/de/' -H 'Content-type: application/json' -d '
     {
       "de": {
         "properties": {

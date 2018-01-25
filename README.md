@@ -81,12 +81,12 @@ Step 2: create mapping on index:
       "de": {
         "properties": {
           "autocomplete": {
-            "type": "string",
+            "type": "text",
             "analyzer": "autocomplete",
             "fielddata": true
           },
           "content": {
-            "type": "string",
+            "type": "text",
             "analyzer" : "default",
             "copy_to": [
               "did_you_mean",
@@ -94,11 +94,11 @@ Step 2: create mapping on index:
             ]
           },
           "did_you_mean": {
-            "type": "string",
+            "type": "text",
             "analyzer": "didYouMean"
           },
           "title": {
-            "type": "string",
+            "type": "text",
             "analyzer" : "default",
             "copy_to": [
               "autocomplete",

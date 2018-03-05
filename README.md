@@ -1,5 +1,5 @@
 # papayacms-module-searchindexer
-A module to feed search indexes after publishing pages or other content
+A module to feed search indexes after publishing pages or other content. Updated for and successfully tested with Elasticsearch 6.1.1.
 
 This readme helps you to set up Elasticsearch.
 

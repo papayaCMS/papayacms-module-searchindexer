@@ -187,6 +187,74 @@ class PapayaModuleElasticsearchDatabaseAccess extends PapayaDatabaseObject {
   }
 
   /**
+   * Set redirection
+   *
+   * @param integer $sourceTopicId
+   * @param integer $targetTopicId
+   * @return boolean
+   */
+  public function setRedirection($sourceTopicId, $targetTopicId) {
+    $sql = "SELECT COUNT(*) num
+              FROM %s
+             WHERE redirection_topic_id = %d
+               AND redirection_target_id = %d";
+    $parameters = [
+      $this->databaseGetTableName('search_indexer_redirects'),
+      $sourceTopicId,
+      $targetTopicId
+    ];
+    $exists = 0;
+    if ($res = $this->databaseQueryFmt($sql, $parameters)) {
+      if ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+        $exists = $row['num'];
+      }
+    }
+    $time = time();
+    if ($exists > 0) {
+      return FALSE !== $this->databaseUpdateRecord(
+        $this->databaseGetTableName('search_indexer_redirects'),
+        ['index_timestamp' => $time],
+        [
+          'redirection_topic_id' => (int)$sourceTopicId,
+          'redirection_target_id' => (int)$targetTopicId
+        ]
+      );
+    } else {
+      return FALSE !== $this->databaseInsertRecord(
+        $this->databaseGetTableName('search_indexer_redirects'),
+        NULL,
+        [
+          'redirection_topic_id' => (int)$sourceTopicId,
+          'redirection_target_id' => (int)$targetTopicId,
+          'index_timestamp' => $time
+        ]
+      );
+    }
+  }
+
+  /**
+   * Get all topic IDs that redirect to a specific target
+   *
+   * @param integer $targetTopicId
+   * @return array
+   */
+  public function getRedirections($targetTopicId) {
+    $result = [];
+    $sql = "SELECT redirection_topic_id, redirection_target_id
+              FROM %s
+             WHERE redirection_target_id = %d";
+    $parameters = [
+      $this->databaseGetTableName('search_indexer_redirects'),
+      $targetTopicId
+    ];
+    if ($res = $this->databaseQueryFmt($sql, $parameters)) {
+      while ($row = $res->fetchRow(DB_FETCHMODE_ASSOC)) {
+        $result[] = $row['redirection_topic_id'];
+      }
+    }
+    return $result;
+  }
+  /**
    * Get total number of page translations
    *
    * @return int

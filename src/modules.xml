@@ -56,5 +56,6 @@
   </modules>
   <tables>
     <table name="search_indexer_status" />
+    <table name="search_indexer_redirects" />
   </tables>
 </modulegroup>

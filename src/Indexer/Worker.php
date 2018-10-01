@@ -73,6 +73,18 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     foreach ($data['languages'] as $languageId) {
       $result = $this->indexPage($data['topic_id'], $languageId) && $result;
     }
+    if ($result) {
+      $redirects = $this->databaseAccess()->getRedirections($data['topic_id']);
+      if ($redirects) {
+        foreach ($redirects as $pageId) {
+          foreach ($data['languages'] as $languageId) {
+            if ($this->indexPage($pageId, $languageId)) {
+              $this->databaseAccess()->setRedirection($pageId, $data['topic_id']);
+            }
+          }
+        }
+      }
+    }
     return $result;
   }
 
@@ -186,10 +198,12 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $redirectCount = 0;
     $cookiesSet = FALSE;
     $content = NULL;
+    $redirectionUrls = [];
     do {
       $stream = @fopen($url, 'r', FALSE, $context);
       $goOn = FALSE;
       $finalUrl = $url;
+      $redirectionUrls[] = $url;
       if ($url = $this->detectRedirection($http_response_header)) {
         $redirectCount++;
         if ($redirectCount < 10) {
@@ -270,6 +284,20 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
         break;
       }
     } while ($goOn);
+    if (count($redirectionUrls) > 1) {
+      $pageIds = [];
+      foreach ($redirectionUrls as $url) {
+        $request = new PapayaRequest();
+        $request->load(new PapayaUrl($url));
+        $pageId = $request->pageId;
+        if (!in_array($pageId, $pageIds)) {
+          $pageIds[] = $pageId;
+        }
+      }
+      if (count($pageIds) > 1) {
+        $this->setRedirections($pageIds);
+      }
+    }
     return $result;
   }
 
@@ -501,6 +529,20 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $language = new PapayaContentLanguage();
     $language->load(['id' => $languageId]);
     return $language['identifier'];
+  }
+
+  /**
+   * Set redirections
+   *
+   * @param $pageIds
+   */
+  private function setRedirections($pageIds) {
+    if (count($pageIds) > 1) {
+      $target = array_pop($pageIds);
+      foreach ($pageIds as $pageId) {
+        $this->databaseAccess()->setRedirection($pageId, $target);
+      }
+    }
   }
 
   /**

@@ -24,12 +24,15 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
     $url = sprintf("http://%s:%d/%s/%s/_search", $host, $port, $index, $language);
 
     if (!empty($term)) {
-      $term = preg_replace('(^\W+)u', '', $term);
-      $term = preg_replace('(\W+$)u', '', $term);
+      $term = preg_replace('(^\s+)u', '', $term);
+      $term = preg_replace('(\s+$)u', '', $term);
       $activeTerm = strtolower($term);
       $exactlyTerm = $activeTerm;
-      if (!preg_match('(\s)', $activeTerm)) {
+      if (!preg_match('(\s|\\*)', $activeTerm)) {
+        $queryString = sprintf('(*%s*) OR (%s)', $this->escapeTerm($activeTerm), $this->escapeTerm($exactlyTerm));
         $activeTerm = sprintf('*%s*', $activeTerm);
+      } else {
+        $queryString = $this->escapeTerm($activeTerm);
       }
 
       $rawQuery = [
@@ -45,7 +48,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
           'size' => $limit,
           'query' => [
               'query_string' => [
-                  'query' => $activeTerm.' OR '.$exactlyTerm,
+                  'query' => $queryString,
                   'fields' => [ 'title^2', 'content' ]
               ]
           ],
@@ -90,6 +93,20 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
       }
     }
     return $return;
+  }
+
+  public function escapeTerm($term) {
+    // remove < and >
+    $result = str_replace(['<', '>'], '', $term);
+    // prefix special characters with backslash
+    $result = preg_replace_callback(
+      '([-+=!(){}[\\]^"~*?:\\\\/]|&&|\\|\\|)',
+      static function($match) {
+        return '\\'.$match[0];
+      },
+      $result
+    );
+    return $result;
   }
 
   /**

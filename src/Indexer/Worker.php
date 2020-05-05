@@ -309,7 +309,7 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    */
   public function takeContent($html) {
     $document = new PapayaXmlDocument();
-    if ($document->loadHtml($html) == FALSE) {
+    if (@$document->loadHtml($html) === FALSE) {
       return NULL;
     }
 

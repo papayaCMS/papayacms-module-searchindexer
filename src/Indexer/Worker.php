@@ -319,7 +319,9 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
           }
           $text = $document->xpath()->evaluate('string(//*[@id="'.$id.'"])');
           return ($text != '') ? $text : NULL;
-        }
+        },
+        NULL,
+        FALSE
       );
     }
     return $html;

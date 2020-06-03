@@ -38,7 +38,9 @@ class PapayaModuleElasticsearchSearchResultPageContentResults {
             if (trim($html) != '') {
               @$document->loadHTML('<?xml encoding="UTF-8" ?>'.$hit->highlight->content[$i]);
               $fragment = $oneResult->appendElement('fragment');
-              foreach ($document->xpath()->evaluate('//body/node()') as $node) {
+              $expression = $document->xpath()->evaluate('count(//body/p) > 0')
+                 ? '//body/p/node()' : '//body/node()';
+              foreach ($document->xpath()->evaluate($expression) as $node) {
                 $fragment->appendChild($fragment->ownerDocument->importNode($node, TRUE));
               }
             }

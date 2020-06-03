@@ -308,17 +308,19 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    * @return mixed|null
    */
   public function takeContent($html) {
-    $document = new PapayaXmlDocument();
-    if (@$document->loadHtml($html) === FALSE) {
-      return NULL;
-    }
-
     $id = $this->option('PAGE_CONTENT_CONTAINER', '');
-
     if ($id != '') {
-      $xPath = $document->xpath();
-      $text = $xPath->evaluate('string(//*[@id="'.$id.'"])');
-      return ($text != '') ? $text : NULL;
+      $errors = new \Papaya\XML\Errors();
+      return $errors->encapsulate(
+        static function () use ($html, $id) {
+          $document = new \Papaya\XML\Document();
+          if (@$document->loadHtml($html) === FALSE) {
+            return NULL;
+          }
+          $text = $document->xpath()->evaluate('string(//*[@id="'.$id.'"])');
+          return ($text != '') ? $text : NULL;
+        }
+      );
     }
     return $html;
   }

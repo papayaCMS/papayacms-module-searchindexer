@@ -29,10 +29,14 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
       $activeTerm = strtolower($term);
       $exactlyTerm = $activeTerm;
       if (!preg_match('(\s|\\*)', $activeTerm)) {
-        $queryString = sprintf('(*%s*) OR (%s)', $this->escapeTerm($activeTerm), $this->escapeTerm($exactlyTerm));
+        $queryString = sprintf(
+          '(*%s*) OR (%s)',
+          $this->connection()->escapeTerm($activeTerm),
+          $this->connection()->escapeTerm($exactlyTerm)
+        );
         $activeTerm = sprintf('*%s*', $activeTerm);
       } else {
-        $queryString = $this->escapeTerm($activeTerm);
+        $queryString = $this->connection()->escapeTerm($activeTerm);
       }
 
       $rawQuery = [
@@ -93,20 +97,6 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
       }
     }
     return $return;
-  }
-
-  public function escapeTerm($term) {
-    // remove < and >
-    $result = str_replace(['<', '>'], '', $term);
-    // prefix special characters with backslash
-    $result = preg_replace_callback(
-      '([-+=!(){}[\\]^"~*?:\\\\/]|&&|\\|\\|)',
-      static function($match) {
-        return '\\'.$match[0];
-      },
-      $result
-    );
-    return $result;
   }
 
   /**

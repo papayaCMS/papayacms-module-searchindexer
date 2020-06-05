@@ -28,4 +28,18 @@ class PapayaModuleElasticsearchConnection {
   public function get() {
     return $this->connection;
   }
+
+  public function escapeTerm($term) {
+    // remove < and >
+    $result = str_replace(['<', '>'], '', $term);
+    // prefix special characters with backslash
+    $result = preg_replace_callback(
+      '([-+=!(){}[\\]^"~*?:\\\\/]|&&|\\|\\|)',
+      static function($match) {
+        return '\\'.$match[0];
+      },
+      $result
+    );
+    return $result;
+  }
 }

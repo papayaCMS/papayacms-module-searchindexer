@@ -28,7 +28,7 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
       $term = preg_replace('(\s+$)u', '', $term);
       $activeTerm = strtolower($term);
       if (!preg_match('(\s|\\*)', $activeTerm)) {
-        $queryString = sprintf('%s*'. $this->connection()->escapeTerm($activeTerm));
+        $queryString = sprintf('%s*', $this->connection()->escapeTerm($activeTerm));
       } else {
         $queryString = $this->connection()->escapeTerm($activeTerm);
       }

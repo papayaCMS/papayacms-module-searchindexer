@@ -85,7 +85,7 @@ class PapayaModuleElasticsearchIndexerWriter {
 
     $context = stream_context_create($options);
     $connection = @fopen($urlPath, 'r', FALSE, $context);
-    if (is_resource($connection)) {
+    if ($connection) {
       if (FALSE !== fwrite($connection, $data)) {
         $result = $searchItemId;
       }

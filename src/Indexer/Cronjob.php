@@ -47,6 +47,15 @@ class PapayaModuleElasticsearchIndexerCronjob extends base_cronjob {
       10,
       'The cronjob will attempt to reindex error pages older than the given number of seconds.',
       86400
+    ],
+    'base_url' => [
+      'Base URL',
+      'isHTTPX',
+      TRUE,
+      'input',
+      1000,
+      '',
+      ''
     ]
   ];
 
@@ -64,9 +73,10 @@ class PapayaModuleElasticsearchIndexerCronjob extends base_cronjob {
   public function execute() {
     $this->setDefaultData();
     $this->worker()->indexAllPages(
-      FALSE,
-      $this->data['indexed_timestamp'],
-      $this->data['error_timestamp']
+      new \Papaya\URL($this->data['base_url']),
+      (int)$this->data['indexed_timestamp'] + (int)$this->data['error_timestamp'] < 1,
+      (int)$this->data['indexed_timestamp'],
+      (int)$this->data['error_timestamp']
     );
     $info = $this->worker()->info();
     $infoString = sprintf(

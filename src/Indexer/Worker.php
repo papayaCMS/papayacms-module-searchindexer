@@ -123,7 +123,10 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    * @param int $errorMinTimestamp optional, default value NULL
    */
   public function indexAllPages(
-    $overrideIndexed = FALSE, $minTimestamp = NULL, $errorMinTimestamp = NULL
+    \Papaya\URL $baseUrl,
+    $overrideIndexed = FALSE,
+    $minTimestamp = NULL,
+    $errorMinTimestamp = NULL
   ) {
 
     $pages = $this->databaseAccess()->getPublicPages();
@@ -157,7 +160,7 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
           break 2;
         }
         $attempted++;
-        if ($this->indexPage($topicId, $languageId)) {
+        if ($this->indexPage($topicId, $languageId, $baseUrl)) {
           $success++;
         } else {
           $errors++;
@@ -181,12 +184,14 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    * @param integer $languageId
    * @return boolean
    */
-  public function indexPage($topicId, $languageId) {
+  public function indexPage($topicId, $languageId, \Papaya\URL $baseUrl = NULL) {
     $result = FALSE;
     $identifier = $this->getLanguageById($languageId);
-    $reference = $this->papaya()->pageReferences->get($identifier, $topicId);
+    $reference = new Papaya\UI\Reference\Page($baseUrl);
     $reference->setPreview(FALSE);
     $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
+    $reference->setPageLanguage($identifier);
+    $reference->setPageId($topicId);
     $url = $reference->get();
     $options = [
       'http' => [

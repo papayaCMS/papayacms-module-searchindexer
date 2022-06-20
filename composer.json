@@ -2,19 +2,17 @@
   "name": "papaya/module-searchindexer",
   "license": "GPL-2.0",
   "homepage": "http://www.papaya-cms.com/",
-  "minimum-stability": "dev",
   "extra" : {
     "document-root" : "htdocs/"
   },
   "require": {
-    "papaya/cms-core": "6.*",
+    "papaya/cms-core": "7.0",
     "papaya/module-default": "1.*",
     "papaya/module-default-cronjobs":"1.*",
     "papaya/module-actions":"1.*"
   },
   "require-dev": {
-    "papaya/test-framework": "6.*",
-    "papaya/cms-administration": "6.*",
+    "papaya/cms-administration": "*",
     "papaya/theme-dynamic": "1.*"
   }
 }

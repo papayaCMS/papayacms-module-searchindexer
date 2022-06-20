@@ -123,7 +123,10 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    * @param int $errorMinTimestamp optional, default value NULL
    */
   public function indexAllPages(
-    $overrideIndexed = FALSE, $minTimestamp = NULL, $errorMinTimestamp = NULL
+    $overrideIndexed = FALSE,
+    $minTimestamp = NULL,
+    $errorMinTimestamp = NULL,
+    $baseUrl = ''
   ) {
 
     $pages = $this->databaseAccess()->getPublicPages();
@@ -133,7 +136,7 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $errors = 0;
     $skippedIndexed = 0;
     $skippedErrors = 0;
-    if (!$overrideIndexed) {
+    if (!($overrideIndexed || $minTimestamp === 0)) {
       $indexedPages = $this->databaseAccess()->getIndexedPages($minTimestamp);
       foreach ($indexedPages as $topicId => $data) {
         foreach ($data as $languageId => $timestamp) {
@@ -149,15 +152,16 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $errorPages = $this->databaseAccess()->getErrorPages($errorMinTimestamp);
     foreach ($pages as $topicId => $languages) {
       foreach ($languages as $languageId) {
-        if (isset($errorPages[$topicId]) && in_array($languageId, $errorPages[$topicId])) {
-          $skippedErrors++;
-          break;
-        }
-        if ($attempted >= 100) {
-          break 2;
-        }
-        $attempted++;
-        if ($this->indexPage($topicId, $languageId)) {
+//        if (isset($errorPages[$topicId]) && in_array($languageId, $errorPages[$topicId])) {
+//          $skippedErrors++;
+//          break;
+//        }
+//        if ($attempted >= 100) {
+//          break 2;
+//        }
+//        $attempted++;
+
+        if ($this->indexPage($topicId, $languageId, $baseUrl)) {
           $success++;
         } else {
           $errors++;
@@ -179,14 +183,19 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    *
    * @param integer $topicId
    * @param integer $languageId
+   * @param string $baseUrl
    * @return boolean
    */
-  public function indexPage($topicId, $languageId) {
+  public function indexPage($topicId, $languageId, $baseUrl = '') {
     $result = FALSE;
     $identifier = $this->getLanguageById($languageId);
-    $reference = $this->papaya()->pageReferences->get($identifier, $topicId);
-    $reference->setPreview(FALSE);
+    $reference = Papaya\UI\Reference\Page::create(
+      $baseUrl ? new Papaya\URL($baseUrl) : $this->papaya()->request->url
+    );
     $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
+    $reference->setPreview(FALSE);
+    $reference->setPageLanguage($identifier);
+    $reference->setPageId($topicId);
     $url = $reference->get();
     $options = [
       'http' => [
@@ -200,7 +209,7 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $content = NULL;
     $redirectionUrls = [];
     do {
-      $stream = @fopen($url, 'r', FALSE, $context);
+      $stream = fopen($url, 'r', FALSE, $context);
       $goOn = FALSE;
       $finalUrl = $url;
       $redirectionUrls[] = $url;

@@ -30,6 +30,15 @@ class PapayaModuleElasticsearchIndexerCronjob extends base_cronjob {
    * @var array
    */
   public $editFields = [
+    'base_url' => [
+      'Base URL',
+      'isHTTPX',
+      TRUE,
+      'input',
+      1024,
+      'The cronjob is not necessarily executed in  a web context, so it needs a base url.',
+      ''
+    ],
     'indexed_timestamp' => [
       'Reindex pages older than',
       'isNum',
@@ -66,7 +75,8 @@ class PapayaModuleElasticsearchIndexerCronjob extends base_cronjob {
     $this->worker()->indexAllPages(
       FALSE,
       $this->data['indexed_timestamp'],
-      $this->data['error_timestamp']
+      $this->data['error_timestamp'],
+      $this->data['base_url']
     );
     $info = $this->worker()->info();
     $infoString = sprintf(

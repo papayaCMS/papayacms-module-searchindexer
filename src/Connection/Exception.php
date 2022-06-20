@@ -34,8 +34,11 @@ class PapayaModuleElasticsearchConnectionException
   /**
    * Create expeiton an store values
    */
-  public function __construct($url) {
-    parent::__construct('Invalid search server connection to: '.$url, 0);
+  public function __construct($url, $message = '') {
+    parent::__construct(
+      'Invalid search server connection to: '.$url.(($message) ? ': '.$message : ''),
+      0
+    );
   }
 
   /**

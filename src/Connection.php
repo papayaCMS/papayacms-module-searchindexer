@@ -10,7 +10,10 @@ class PapayaModuleElasticsearchConnection {
     $this->connection = @fopen($url, 'r', FALSE, $context);
 
     if (!$this->connection){
-      throw new PapayaModuleElasticsearchConnectionException($url);
+      throw new PapayaModuleElasticsearchConnectionException(
+        $url,
+        $http_response_header[0] ?? ''
+      );
     }
 
     return $this->connection;

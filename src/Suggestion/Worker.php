@@ -34,25 +34,11 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
       }
 
       $rawQuery = [
-        'size'=> 0,
-        'aggs'=> [
+        'suggest' => [
           'autocomplete' => [
-            'terms' => [
-              'field' => 'autocomplete',
-              'order' => [
-                '_count' => 'desc'
-              ],
-              'include' => [
-                'pattern' => $queryString
-              ],
-              'size' => $this->option('SUGGESTER_LIMIT', 10)
-            ]
-          ]
-        ],
-        'query' => [
-          'prefix' => [
-            'autocomplete' => [
-              'value' => $activeTerm
+            'text' => $queryString,
+            'term' =>  [
+              'field' => 'content',
             ]
           ]
         ]

@@ -67,7 +67,7 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
             $term,
             $language
         );
-        $return = $this->prepareResults($return->aggregations->autocomplete->buckets);
+        $return = $this->prepareResults($return->suggest->autocomplete);
       } catch (PapayaModuleElasticsearchException $e) {
         $result->appendElement(
             'results',
@@ -86,49 +86,29 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
 
   public function prepareResults($bucketResults) {
 
-    $newBucketsResultsOneWord = [];
-
-    foreach ($bucketResults as $oneResult) {
-      if (count(explode(" ", $oneResult->key)) == 1) {
-        array_push($newBucketsResultsOneWord, $oneResult->key);
-      }
-    }
-
-    $newBucketsResults = [];
-
-    foreach ($bucketResults as $oneResult) {
-      if (count($newBucketsResults) == 0) {
-        array_push($newBucketsResults, $oneResult->key);
-      } else {
-        $match = false;
-        foreach ($newBucketsResults as $key => $oneElement) {
-          if (strpos($oneResult->key, $oneElement) !== FALSE && strlen($oneResult->key) > strlen($oneElement)) {
-            $newBucketsResults[$key] = $oneResult->key;
-            $match = true;
-            break;
-          }
+    $results = array_unique(
+      array_reduce(
+        $bucketResults,
+        function($carry, $term) {
+          $carry[] = $term->text;
+          return array_merge(
+            $carry,
+            array_map(
+              function($option) {
+                return $option->text;
+              },
+              $term->options
+            )
+          );
         }
-        if ($match == false) {
-          array_push($newBucketsResults, $oneResult->key);
-        }
-      }
-    }
+      )
+    );
 
-    $results = $newBucketsResultsOneWord;
-
-    foreach ($newBucketsResults as $oneResult) {
-      if ($this->inArray($newBucketsResultsOneWord, $oneResult) == false) {
-        array_push($results, $oneResult);
-      }
-    }
-
-    $resultLimited = [];
-    $counter = 0;
-    foreach ($results as $oneResult) {
-      if ($this->getOwner()->content()->get('prepared_limit', 0) > $counter++) {
-        array_push($resultLimited, $oneResult);
-      }
-    }
+    $resultLimited = array_slice(
+      $results,
+      0,
+      $this->getOwner()->content()->get('prepared_limit', 0)
+    );
 
     return $resultLimited;
   }

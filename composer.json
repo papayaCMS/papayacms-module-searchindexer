@@ -6,7 +6,7 @@
     "document-root" : "htdocs/"
   },
   "require": {
-    "papaya/cms-core": "7.0",
+    "papaya/cms-core": "6.*|7.0",
     "papaya/module-default": "1.*",
     "papaya/module-default-cronjobs":"1.*",
     "papaya/module-actions":"1.*"

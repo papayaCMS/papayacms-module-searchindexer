@@ -28,17 +28,29 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
       $term = preg_replace('(\s+$)u', '', $term);
       $activeTerm = strtolower($term);
       if (!preg_match('(\s|\\*)', $activeTerm)) {
-        $queryString = sprintf('%s*', $this->connection()->escapeTerm($activeTerm));
+        $queryString = sprintf('%s.*', $this->connection()->escapeTerm($activeTerm));
       } else {
         $queryString = $this->connection()->escapeTerm($activeTerm);
       }
 
       $rawQuery = [
-        'suggest' => [
+        'size'=> 0,
+        'aggs'=> [
           'autocomplete' => [
-            'text' => $queryString,
-            'term' =>  [
-              'field' => 'content',
+            'terms' => [
+              'field' => 'autocomplete',
+              'order' => [
+                '_count' => 'desc'
+              ],
+              'include' => $queryString,
+              'size' => $this->option('SUGGESTER_LIMIT', 10)
+            ]
+          ],
+        ],
+        'query' => [
+          'prefix' => [
+            'autocomplete' => [
+              'value' => $activeTerm,
             ]
           ]
         ]
@@ -48,6 +60,7 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
       $options = [
           'http' => [
               'method' => 'GET',
+              // 'ignore_errors' => true,
               'header' => "Content-type: application/json\r\nContent-length: " . strlen($query),
               'content' => $query
           ]

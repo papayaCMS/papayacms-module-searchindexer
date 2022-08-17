@@ -67,7 +67,9 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
             $term,
             $language
         );
-        $return = $this->prepareResults($return->suggest->autocomplete);
+        $return = $this->prepareResults(
+          $return->aggregations->autocomplete->buckets
+        );
       } catch (PapayaModuleElasticsearchException $e) {
         $result->appendElement(
             'results',
@@ -86,21 +88,13 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
 
   public function prepareResults($bucketResults) {
 
+
     $results = array_unique(
-      array_reduce(
-        $bucketResults,
-        function($carry, $term) {
-          $carry[] = $term->text;
-          return array_merge(
-            $carry,
-            array_map(
-              function($option) {
-                return $option->text;
-              },
-              $term->options
-            )
-          );
-        }
+      array_map(
+        function($term) {
+          return $term->key;
+        },
+        $bucketResults
       )
     );
 

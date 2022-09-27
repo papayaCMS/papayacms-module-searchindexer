@@ -193,10 +193,10 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
       $baseUrl ? new Papaya\URL($baseUrl) : $this->papaya()->request->url
     );
     $reference->setOutputMode($this->option('OUTPUT_MODE', 'html'));
-    $reference->setPreview(FALSE);
     $reference->setPageLanguage($identifier);
     $reference->setPageId($topicId);
-    $url = $reference->get();
+    $reference->setPreview(FALSE);
+    $url = $reference->get(TRUE);
     $options = [
       'http' => [
         'method' => 'POST',

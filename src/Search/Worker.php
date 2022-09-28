@@ -39,6 +39,14 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
         $queryString = $this->connection()->escapeTerm($activeTerm);
       }
 
+      $titleBoost = min(
+        10,
+        max(
+          2,
+          $this->option('BOOST_TITLE', 6)
+        )
+      );
+
       $rawQuery = [
           'suggest' => [
               'didYouMean' => [
@@ -53,7 +61,7 @@ class PapayaModuleElasticsearchSearchWorker extends PapayaObject {
           'query' => [
               'query_string' => [
                   'query' => $queryString,
-                  'fields' => [ 'title^2', 'content' ]
+                  'fields' => [ 'title^'.$titleBoost, 'content' ]
               ]
           ],
           'sort' => [

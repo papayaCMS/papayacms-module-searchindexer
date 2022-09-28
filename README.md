@@ -20,10 +20,11 @@ Step 1: create index with settings:
                 "language": "german"
               },
               "autocompleteFilter": {
-                "max_shingle_size": "8",
-                "min_shingle_size": "3",
+                "max_shingle_size": "6",
+                "min_shingle_size": "2",
                 "type": "shingle",
-                "output_unigrams" : false
+                "filler_token": "",
+                "output_unigrams" : true
               },
               "stopwords": {
                 "type": "stop",
@@ -46,8 +47,8 @@ Step 1: create index with settings:
               "autocomplete": {
                 "filter": [
                   "lowercase",
-                  "autocompleteFilter",
-                  "stopwords"
+                  "stopwords",
+                  "autocompleteFilter"
                 ],
                 "char_filter": [
                   "html_strip"
@@ -95,7 +96,8 @@ Step 2: create mapping on index:
           },
           "did_you_mean": {
             "type": "text",
-            "analyzer": "didYouMean"
+            "analyzer": "didYouMean",
+            "fielddata": true
           },
           "title": {
             "type": "text",
@@ -162,24 +164,27 @@ Manually suggest request
     curl -XPOST 'http://host:9200/myindex/de/_search/' -d '
     {
       "size": 0,
-      "aggs": {
-        "autocomplete": {
+      "aggregations": {
+        "didYouMean": {
           "terms": {
-            "field": "autocomplete",
+            "field": "didYouMean",
             "order": {
               "_count": "desc"
-    
             },
             "include": {
               "pattern": "patient.*"
             }
           }
-        }
-      },
-      "query": {
-        "prefix": {
-          "autocomplete": {
-            "value": "patient"
+        },
+        "autocomplete": {
+          "terms": {
+            "field": "autocomplete",
+            "order": {
+              "_count": "desc"
+            },
+            "include": {
+              "pattern": "patient.*"
+            }
           }
         }
       }

@@ -108,6 +108,15 @@ class PapayaModuleElasticsearchSearchConnector extends base_connector {
       30,
       '',
       '100'
+    ],
+    'BOOST_TITLE' => [
+      'Boost for title',
+      'isNum',
+      TRUE,
+      'input',
+      1,
+      '',
+      6
     ]
   ];
 

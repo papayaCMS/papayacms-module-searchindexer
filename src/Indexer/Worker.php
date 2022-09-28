@@ -152,14 +152,14 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
     $errorPages = $this->databaseAccess()->getErrorPages($errorMinTimestamp);
     foreach ($pages as $topicId => $languages) {
       foreach ($languages as $languageId) {
-//        if (isset($errorPages[$topicId]) && in_array($languageId, $errorPages[$topicId])) {
-//          $skippedErrors++;
-//          break;
-//        }
-//        if ($attempted >= 100) {
-//          break 2;
-//        }
-//        $attempted++;
+        if (isset($errorPages[$topicId]) && in_array($languageId, $errorPages[$topicId])) {
+          $skippedErrors++;
+          break;
+        }
+        if ($attempted >= 100) {
+          break 2;
+        }
+        $attempted++;
 
         if ($this->indexPage($topicId, $languageId, $baseUrl)) {
           $success++;

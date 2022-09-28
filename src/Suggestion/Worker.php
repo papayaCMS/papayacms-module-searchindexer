@@ -35,7 +35,17 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
 
       $rawQuery = [
         'size'=> 0,
-        'aggs'=> [
+        'aggregations'=> [
+          'didYouMean' => [
+            'terms' => [
+              'field' => 'didYouMean',
+              'order' => [
+                '_count' => 'desc'
+              ],
+              'include' => $queryString,
+              'size' => $this->option('SUGGESTER_LIMIT', 10)
+            ]
+          ],
           'autocomplete' => [
             'terms' => [
               'field' => 'autocomplete',
@@ -46,13 +56,6 @@ class PapayaModuleElasticsearchSuggestionWorker extends PapayaObject {
               'size' => $this->option('SUGGESTER_LIMIT', 10)
             ]
           ],
-        ],
-        'query' => [
-          'prefix' => [
-            'autocomplete' => [
-              'value' => $activeTerm,
-            ]
-          ]
         ]
       ];
 

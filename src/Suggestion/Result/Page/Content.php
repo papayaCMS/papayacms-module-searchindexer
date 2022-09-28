@@ -67,9 +67,7 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
             $term,
             $language
         );
-        $return = $this->prepareResults(
-          $return->aggregations->autocomplete->buckets
-        );
+        $return = $this->prepareResults($return->aggregations);
       } catch (PapayaModuleElasticsearchException $e) {
         $result->appendElement(
             'results',
@@ -88,13 +86,28 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
 
   public function prepareResults($bucketResults) {
 
+    $flatResults = array_reduce(
+      array_values((array)$bucketResults),
+      function($carry, $current) {
+        return array_merge($carry, $current->buckets ?? []);
+      },
+      []
+    );
+    sort(
+      $flatResults,
+      function($a, $b) {
+        if ($a->doc_count !== $b->doc_count) {
+          return $b->doc_count - $a->doc_count;
+        }
+      }
+    );
 
     $results = array_unique(
       array_map(
         function($term) {
-          return $term->key;
+          return $this->normalizeSpace($term->key);
         },
-        $bucketResults
+        $flatResults
       )
     );
 
@@ -105,6 +118,10 @@ class PapayaModuleElasticsearchSuggestionResultPageContent {
     );
 
     return $resultLimited;
+  }
+
+  private function normalizeSpace($text) {
+    return trim(preg_replace('(\s+)', ' ', $text));
   }
 
   public function inArray ($elements, $value) {

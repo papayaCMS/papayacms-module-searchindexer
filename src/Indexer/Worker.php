@@ -243,14 +243,17 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
         if (isset($titles[$topicId])) {
           $title = $titles[$topicId];
         }
-        $content = $this->takeContent($content);
-        if (is_null($content)) {
+        $pageData = $this->takeDataFromHTML($url, $content);
+        if (!$pageData) {
           $status = 'no-content';
           $this->setIndexed($topicId, $languageId, $topicId, $status);
         } else {
           $duplicate = FALSE;
-          $contentDigest = $this->getDigest($content);
-          $statuses = $this->databaseAccess()->getIndexStatusesByUrlOrDigest($finalUrl, $contentDigest);
+          $contentDigest = $this->getDigest($pageData->content);
+          $statuses = $this->databaseAccess()->getIndexStatusesByUrlOrDigest(
+            $finalUrl,
+            $contentDigest
+          );
           foreach ($statuses as $pageId => $statusData) {
             if ($topicId != $pageId && (
                   $finalUrl == $statusData['url'] ||
@@ -268,7 +271,9 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
             }
           }
           if (!$duplicate) {
-            $result = $this->addToIndex($topicId, $identifier, $finalUrl, $content, $title);
+            $result = $this->addToIndex(
+              $topicId, $identifier, $finalUrl, $pageData->content, $pageData->title ?: $title
+            );
             $status = 'error';
             $logUrl = '';
             $logDigest = '';
@@ -313,27 +318,16 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
   /**
    * Retrieve the content from a content container if defined
    *
+   * @param string $url
    * @param string $html
-   * @return mixed|null
+   * @return PapayaModuleElasticsearchIndexerWorkerPage|null
    */
-  public function takeContent($html) {
+  public function takeDataFromHTML($url, $html) {
     $id = $this->option('PAGE_CONTENT_CONTAINER', '');
-    if ($id != '') {
-      $errors = new \Papaya\XML\Errors();
-      return $errors->encapsulate(
-        static function () use ($html, $id) {
-          $document = new \Papaya\XML\Document();
-          if (@$document->loadHtml($html) === FALSE) {
-            return NULL;
-          }
-          $text = $document->xpath()->evaluate('string(//*[@id="'.$id.'"])');
-          return ($text != '') ? $text : NULL;
-        },
-        NULL,
-        FALSE
-      );
-    }
-    return $html;
+    $data = new PapayaModuleElasticsearchIndexerWorkerPage($url, $html, $id);
+    return ($data->isValid && $data->isIndexable)
+      ? $data
+      : null;
   }
 
   /**

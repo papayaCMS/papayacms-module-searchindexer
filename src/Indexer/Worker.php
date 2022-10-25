@@ -188,6 +188,20 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
    */
   public function indexPage($topicId, $languageId, $baseUrl = '') {
     $result = FALSE;
+    $allowedContentTypes = array_filter(
+      array_map(
+        function($contentType) {
+          return strtolower(trim($contentType));
+        },
+        explode(
+          "\n",
+          $this->option('PAGE_CONTENT_TYPES', 'text/html')
+        )
+      ),
+      function($contentType) {
+        return $contentType !== '';
+      }
+    );
     $identifier = $this->getLanguageById($languageId);
     $reference = Papaya\UI\Reference\Page::create(
       $baseUrl ? new Papaya\URL($baseUrl) : $this->papaya()->request->url
@@ -236,6 +250,21 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
         }
       }
       if (!$url && is_resource($stream)) {
+        $contentType = $this->detectContentType($http_response_header);
+        if (!in_array($contentType, $allowedContentTypes)) {
+          $this->setIndexed(
+            $topicId,
+            $languageId,
+            $this->lastSearchItemId(),
+            'error',
+            sprintf(
+            'Invalid content type "%s" at "%s".',
+              $contentType,
+              $finalUrl
+            )
+          );
+          break;
+        }
         $content = stream_get_contents($stream);
         fclose($stream);
         $titles = $this->pagesConnector()->getTitles($topicId, $languageId);
@@ -393,6 +422,19 @@ class PapayaModuleElasticsearchIndexerWorker extends PapayaObject {
       $result = $this->searchLocation($headers);
     }
     return $result;
+  }
+
+  /**
+   * @param string[] $headers
+   * @return string
+   */
+  private function detectContentType($headers) {
+    foreach ($headers as $headerString) {
+      if (preg_match('(^Content-Type:([^;]+))i', $headerString, $matches)) {
+        return strtolower(trim($matches[1]));
+      }
+    }
+    return 'application/octet-stream';
   }
 
   /**

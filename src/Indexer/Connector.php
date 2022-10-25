@@ -62,6 +62,15 @@ class PapayaModuleElasticsearchIndexerConnector extends base_connector {
           'input',
           100
       ],
+      'PAGE_CONTENT_TYPES' => [
+        'Content types',
+        'isSomeText',
+        TRUE,
+        'textarea',
+        8,
+        '',
+        "text/html"
+      ],
       'PAGE_CONTENT_CONTAINER' => [
           'Content container',
           'isSomeText',
